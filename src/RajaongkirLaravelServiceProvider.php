@@ -1,12 +1,13 @@
 <?php
 
-namespace Komodo\RajaongkirLaravel;
+namespace Komodo\RajaOngkirLaravel;
 
 use Komodo\RajaongkirLaravel\Commands\RajaongkirLaravelCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Komodo\RajaOngkirLaravel\Commands\RajaOngkirLaravelCommand;
 
-class RajaongkirLaravelServiceProvider extends PackageServiceProvider
+class RajaOngkirLaravelServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
@@ -20,6 +21,6 @@ class RajaongkirLaravelServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasViews()
             ->hasMigration('create_rajaongkir_laravel_table')
-            ->hasCommand(RajaongkirLaravelCommand::class);
+            ->hasCommand(RajaOngkirLaravelCommand::class);
     }
 }

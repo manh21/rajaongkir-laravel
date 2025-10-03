@@ -1,5 +1,5 @@
 <?php
 
-use Komodo\RajaongkirLaravel\Tests\TestCase;
+use Komodo\RajaOngkirLaravel\Tests\TestCase;
 
 uses(TestCase::class)->in(__DIR__);

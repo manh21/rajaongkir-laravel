@@ -1,5 +1,5 @@
 <?php
 
-namespace Komodo\RajaongkirLaravel;
+namespace Komodo\RajaOngkirLaravel;
 
-class RajaongkirLaravel {}
+class RajaOngkirLaravel {}

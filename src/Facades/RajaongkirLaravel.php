@@ -1,16 +1,16 @@
 <?php
 
-namespace Komodo\RajaongkirLaravel\Facades;
+namespace Komodo\RajaOngkirLaravel\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see \Komodo\RajaongkirLaravel\RajaongkirLaravel
+ * @see \Komodo\RajaOngkirLaravel\RajaOngkirLaravel
  */
-class RajaongkirLaravel extends Facade
+class RajaOngkirLaravel extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
-        return \Komodo\RajaongkirLaravel\RajaongkirLaravel::class;
+        return \Komodo\RajaOngkirLaravel\RajaOngkirLaravel::class;
     }
 }

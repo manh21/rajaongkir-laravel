@@ -1,10 +1,10 @@
 <?php
 
-namespace Komodo\RajaongkirLaravel\Tests;
+namespace Komodo\RajaOngkirLaravel\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Komodo\RajaongkirLaravel\RajaongkirLaravelServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Komodo\RajaOngkirLaravel\RajaOngkirLaravelServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -13,14 +13,14 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Komodo\\RajaongkirLaravel\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'Komodo\\RajaOngkirLaravel\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
     }
 
     protected function getPackageProviders($app)
     {
         return [
-            RajaongkirLaravelServiceProvider::class,
+            RajaOngkirLaravelServiceProvider::class,
         ];
     }
 

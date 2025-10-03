@@ -1,6 +1,6 @@
 <?php
 
-// config for Komodo/RajaongkirLaravel
+// config for Komodo/RajaOngkirLaravel
 return [
 
 ];

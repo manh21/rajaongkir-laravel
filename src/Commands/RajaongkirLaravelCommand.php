@@ -1,10 +1,10 @@
 <?php
 
-namespace Komodo\RajaongkirLaravel\Commands;
+namespace Komodo\RajaOngkirLaravel\Commands;
 
 use Illuminate\Console\Command;
 
-class RajaongkirLaravelCommand extends Command
+class RajaOngkirLaravelCommand extends Command
 {
     public $signature = 'rajaongkir-laravel';
 
