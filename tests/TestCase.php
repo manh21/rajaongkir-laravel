@@ -3,8 +3,8 @@
 namespace Komodo\RajaongkirLaravel\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Orchestra\Testbench\TestCase as Orchestra;
 use Komodo\RajaongkirLaravel\RajaongkirLaravelServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
