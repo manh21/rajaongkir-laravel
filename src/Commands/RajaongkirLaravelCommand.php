@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Komodo\RajaongkirLaravel\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class RajaongkirLaravelCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'rajaongkir-laravel';
 
     public $description = 'My command';
 

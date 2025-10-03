@@ -1,17 +1,17 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "manh21/rajaongkir-laravel",
+    "description": "Library PHP untuk mengintegrasikan dengan API RajaOngkir V2. Library ini menyediakan antarmuka yang mudah digunakan untuk mengakses berbagai fitur yang disediakan oleh RajaOngkir V2, termasuk perhitungan ongkos kirim domestik, internasional, dan pelacakan resi.",
     "keywords": [
-        ":vendor_name",
+        "Naufal Hakim",
         "laravel",
-        ":package_slug"
+        "rajaongkir-laravel"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/manh21/rajaongkir-laravel",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Naufal Hakim",
+            "email": "naufal@senusa.app",
             "role": "Developer"
         }
     ],
@@ -30,18 +30,17 @@
         "pestphp/pest-plugin-laravel": "^4.0",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan-deprecation-rules": "^2.0",
-        "phpstan/phpstan-phpunit": "^2.0",
-        "spatie/laravel-ray": "^1.35"
+        "phpstan/phpstan-phpunit": "^2.0"
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src/",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories/"
+            "Komodo\\RajaongkirLaravel\\": "src/",
+            "Komodo\\RajaongkirLaravel\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests/",
+            "Komodo\\RajaongkirLaravel\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/"
         }
     },
@@ -63,10 +62,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
+                "Komodo\\RajaongkirLaravel\\RajaongkirLaravelServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\Facades\\Skeleton"
+                "RajaongkirLaravel": "Komodo\\RajaongkirLaravel\\Facades\\RajaongkirLaravel"
             }
         }
     },
