@@ -59,6 +59,7 @@ class RajaOngkir
     {
         try {
             $store = Cache::getStore();
+
             return method_exists($store, 'tags') && in_array('Illuminate\Contracts\Cache\TaggableStore', class_implements($store));
         } catch (\Exception $e) {
             return false;
@@ -70,10 +71,10 @@ class RajaOngkir
      */
     protected function getCacheInstance(array $tags = []): \Illuminate\Contracts\Cache\Repository
     {
-        if ($this->cacheSupportsTagging() && !empty($tags)) {
+        if ($this->cacheSupportsTagging() && ! empty($tags)) {
             return Cache::tags($tags);
         }
-        
+
         return Cache::store();
     }
 
@@ -436,8 +437,8 @@ class RajaOngkir
     {
         // Clear provinces cache
         Cache::forget('rajaongkir.provinces');
-        
-        // Note: We cannot efficiently clear all city/district/subdistrict caches 
+
+        // Note: We cannot efficiently clear all city/district/subdistrict caches
         // without tagging support as the keys are dynamic.
         // In practice, users should consider using Redis/Memcached for better cache management.
     }
