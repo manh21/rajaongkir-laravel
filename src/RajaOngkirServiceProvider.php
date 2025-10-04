@@ -28,7 +28,7 @@ class RajaOngkirServiceProvider extends PackageServiceProvider
     public function packageRegistered(): void
     {
         $this->app->singleton(RajaOngkir::class, function ($app) {
-            return new RajaOngkir();
+            return new RajaOngkir;
         });
 
         $this->app->singleton('rajaongkir', function ($app) {
@@ -36,7 +36,7 @@ class RajaOngkirServiceProvider extends PackageServiceProvider
         });
 
         $this->app->singleton(ApiServices::class, function ($app) {
-            return new ApiServices();
+            return new ApiServices;
         });
     }
 }

@@ -430,8 +430,6 @@ class RajaOngkir
     /**
      * Validate calculate cost inputs
      *
-     * @param array $data
-     * @return void
      * @throws \Illuminate\Validation\ValidationException
      */
     protected function validateCalculateCostInputs(array $data): void
@@ -463,7 +461,7 @@ class RajaOngkir
             'courier.*' => [
                 'required',
                 'string',
-                new CourierRule(),
+                new CourierRule,
             ],
             'sort_by' => [
                 'nullable',
