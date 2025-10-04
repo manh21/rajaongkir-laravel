@@ -1,6 +1,6 @@
 {
     "name": "manh21/rajaongkir-laravel",
-    "description": "Library PHP untuk mengintegrasikan dengan API RajaOngkir V2. Library ini menyediakan antarmuka yang mudah digunakan untuk mengakses berbagai fitur yang disediakan oleh RajaOngkir V2, termasuk perhitungan ongkos kirim domestik, internasional, dan pelacakan resi.",
+    "description": "RajaOngkir Komerce Laravel Package adalah package PHP yang menyediakan integrasi mudah dan lengkap dengan API RajaOngkir V2 by Komerce. Package ini dirancang khusus untuk aplikasi Laravel dengan fitur-fitur modern seperti caching, validasi, dan dukungan multi-bahasa.",
     "keywords": [
         "Naufal Hakim",
         "laravel",
@@ -69,6 +69,6 @@
             }
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }
