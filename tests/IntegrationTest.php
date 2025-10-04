@@ -281,13 +281,13 @@ describe('Error Handling', function () {
         // Use a completely fresh test without any cache interference
         // Create test in complete isolation with no cache
         config(['cache.default' => 'null']); // Use null cache driver
-        
+
         Http::fake([
             'https://rajaongkir.komerce.id/api/v1/province' => Http::response(['error' => 'API Error'], 500),
             '*rajaongkir.komerce.id*' => Http::response(['error' => 'API Error'], 500),
         ]);
 
-        // Create a new instance 
+        // Create a new instance
         $rajaongkir = new RajaOngkir;
 
         // This should handle the API error appropriately
