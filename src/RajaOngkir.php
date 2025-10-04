@@ -4,7 +4,6 @@ namespace Komodo\RajaOngkir;
 
 use Illuminate\Support\Facades\Cache;
 use Komodo\RajaOngkir\Facades\Api;
-use Komodo\RajaOngkir\Requests\CalculateCostRequest;
 use Komodo\RajaOngkir\Rules\CourierRule;
 
 class RajaOngkir
@@ -138,8 +137,8 @@ class RajaOngkir
         // Convert courier enums to string values if necessary
         $courierValues = CourierRule::convertCouriersToValues($courier);
 
-        // Create a request instance with the provided data
-        $request = new CalculateCostRequest([
+        // Validate input parameters
+        $this->validateCalculateCostInputs([
             'origin_id' => $originId,
             'destination_id' => $destinationId,
             'weight' => $weight,
@@ -147,10 +146,13 @@ class RajaOngkir
             'sort_by' => $sortBy,
         ]);
 
-        // Validate the request
-        $request->validate();
-
-        $data = $request->getCalculateCostData();
+        $data = [
+            'origin_id' => $originId,
+            'destination_id' => $destinationId,
+            'weight' => $weight,
+            'courier' => $courierValues,
+            'sort_by' => $sortBy,
+        ];
 
         $courierString = implode(':', $data['courier']);
         $cacheKey = "rajaongkir.cost.{$data['origin_id']}.{$data['destination_id']}.{$data['weight']}.{$courierString}.{$data['sort_by']}";
@@ -236,8 +238,8 @@ class RajaOngkir
         // Convert courier enums to string values if necessary
         $courierValues = CourierRule::convertCouriersToValues($courier);
 
-        // Create a request instance with the provided data
-        $request = new CalculateCostRequest([
+        // Validate input parameters
+        $this->validateCalculateCostInputs([
             'origin_id' => $originId,
             'destination_id' => $destinationId,
             'weight' => $weight,
@@ -245,10 +247,13 @@ class RajaOngkir
             'sort_by' => $sortBy,
         ]);
 
-        // Validate the request
-        $request->validate();
-
-        $data = $request->getCalculateCostData();
+        $data = [
+            'origin_id' => $originId,
+            'destination_id' => $destinationId,
+            'weight' => $weight,
+            'courier' => $courierValues,
+            'sort_by' => $sortBy,
+        ];
 
         $path = '/calculate/domestic-cost';
         $courierString = implode(':', $data['courier']);
@@ -270,14 +275,14 @@ class RajaOngkir
     /**
      * Calculate international cost
      *
-     * @param  string  $originId  origin id (country code)
-     * @param  string  $destinationId  destination id (country code)
+     * @param  int  $originId  origin id (country id)
+     * @param  int  $destinationId  destination id (country id)
      * @param  int  $weight  weight in grams
      * @param  array  $courier  courier codes array (Courier enum objects or strings)
      */
     public function calculateInternationalCost(
-        string $originId,
-        string $destinationId,
+        int $originId,
+        int $destinationId,
         int $weight,
         array $courier,
         ?string $sortBy = 'lowest'
@@ -285,8 +290,8 @@ class RajaOngkir
         // Convert courier enums to string values if necessary
         $courierValues = CourierRule::convertCouriersToValues($courier);
 
-        // Create a request instance with the provided data
-        $request = new CalculateCostRequest([
+        // Validate input parameters for international cost (adjusted for string origin/destination)
+        $this->validateCalculateCostInputs([
             'origin_id' => $originId,
             'destination_id' => $destinationId,
             'weight' => $weight,
@@ -294,10 +299,13 @@ class RajaOngkir
             'sort_by' => $sortBy,
         ]);
 
-        // Validate the request
-        $request->validate();
-
-        $data = $request->getCalculateCostData();
+        $data = [
+            'origin_id' => $originId,
+            'destination_id' => $destinationId,
+            'weight' => $weight,
+            'courier' => $courierValues,
+            'sort_by' => $sortBy,
+        ];
 
         $path = '/calculate/international-cost';
         $courierString = implode(':', $data['courier']);
@@ -417,5 +425,72 @@ class RajaOngkir
         $this->costCacheDuration = $seconds;
 
         return $this;
+    }
+
+    /**
+     * Validate calculate cost inputs
+     *
+     * @param array $data
+     * @return void
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function validateCalculateCostInputs(array $data): void
+    {
+        $validator = \Illuminate\Support\Facades\Validator::make($data, [
+            'origin_id' => [
+                'required',
+                'integer',
+                'min:1',
+            ],
+            'destination_id' => [
+                'required',
+                'integer',
+                'min:1',
+                'different:origin_id',
+            ],
+            'weight' => [
+                'required',
+                'integer',
+                'min:1',
+                'max:30000', // RajaOngkir max weight limit (30kg in grams)
+            ],
+            'courier' => [
+                'required',
+                'array',
+                'min:1',
+                'max:5', // Reasonable limit for courier selection
+            ],
+            'courier.*' => [
+                'required',
+                'string',
+                new CourierRule(),
+            ],
+            'sort_by' => [
+                'nullable',
+                'string',
+                'in:lowest,highest',
+            ],
+        ], [
+            'origin_id.required' => __('rajaongkir::rajaongkir.validation.origin_required'),
+            'origin_id.integer' => __('rajaongkir::rajaongkir.validation.origin_must_be_integer'),
+            'origin_id.min' => __('rajaongkir::rajaongkir.validation.origin_must_be_positive'),
+            'destination_id.required' => __('rajaongkir::rajaongkir.validation.destination_required'),
+            'destination_id.integer' => __('rajaongkir::rajaongkir.validation.destination_must_be_integer'),
+            'destination_id.min' => __('rajaongkir::rajaongkir.validation.destination_must_be_positive'),
+            'destination_id.different' => __('rajaongkir::rajaongkir.validation.destination_must_be_different'),
+            'weight.required' => __('rajaongkir::rajaongkir.validation.weight_required'),
+            'weight.integer' => __('rajaongkir::rajaongkir.validation.weight_must_be_integer'),
+            'weight.min' => __('rajaongkir::rajaongkir.validation.weight_must_be_positive'),
+            'weight.max' => __('rajaongkir::rajaongkir.validation.weight_exceeds_limit'),
+            'courier.required' => __('rajaongkir::rajaongkir.validation.courier_required'),
+            'courier.array' => __('rajaongkir::rajaongkir.validation.courier_must_be_array'),
+            'courier.min' => __('rajaongkir::rajaongkir.validation.courier_minimum_selection'),
+            'courier.max' => __('rajaongkir::rajaongkir.validation.courier_maximum_selection'),
+            'sort_by.in' => __('rajaongkir::rajaongkir.validation.sort_by_invalid'),
+        ]);
+
+        if ($validator->fails()) {
+            throw new \Illuminate\Validation\ValidationException($validator);
+        }
     }
 }
