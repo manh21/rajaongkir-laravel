@@ -29,7 +29,7 @@ class CalculateCostRequest extends FormRequest
                 'min:1',
             ],
             'destination_id' => [
-                'required', 
+                'required',
                 'integer',
                 'min:1',
                 'different:origin_id',
@@ -49,7 +49,7 @@ class CalculateCostRequest extends FormRequest
             'courier.*' => [
                 'required',
                 'string',
-                new CourierRule(),
+                new CourierRule,
             ],
             'sort_by' => [
                 'nullable',
@@ -108,9 +108,9 @@ class CalculateCostRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         // Ensure sort_by has a default value
-        if (!$this->has('sort_by') || is_null($this->input('sort_by'))) {
+        if (! $this->has('sort_by') || is_null($this->input('sort_by'))) {
             $this->merge([
-                'sort_by' => 'lowest'
+                'sort_by' => 'lowest',
             ]);
         }
     }
@@ -126,13 +126,11 @@ class CalculateCostRequest extends FormRequest
 
     /**
      * Get validated data as array suitable for the calculate cost method
-     *
-     * @return array
      */
     public function getCalculateCostData(): array
     {
         $validated = $this->validated();
-        
+
         return [
             'origin_id' => $validated['origin_id'],
             'destination_id' => $validated['destination_id'],

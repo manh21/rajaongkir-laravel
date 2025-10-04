@@ -7,7 +7,8 @@ use Komodo\RajaOngkir\Facades\Api;
 use Komodo\RajaOngkir\Requests\CalculateCostRequest;
 use Komodo\RajaOngkir\Rules\CourierRule;
 
-class RajaOngkir {
+class RajaOngkir
+{
     /**
      * Cache duration for location data (in seconds)
      * Default: 24 hours
@@ -24,12 +25,16 @@ class RajaOngkir {
      * Cache tags for different data types
      */
     protected const CACHE_TAG_LOCATIONS = 'rajaongkir.locations';
-    protected const CACHE_TAG_PROVINCES = 'rajaongkir.provinces';
-    protected const CACHE_TAG_CITIES = 'rajaongkir.cities';
-    protected const CACHE_TAG_DISTRICTS = 'rajaongkir.districts';
-    protected const CACHE_TAG_SUBDISTRICTS = 'rajaongkir.subdistricts';
-    protected const CACHE_TAG_COSTS = 'rajaongkir.costs';
 
+    protected const CACHE_TAG_PROVINCES = 'rajaongkir.provinces';
+
+    protected const CACHE_TAG_CITIES = 'rajaongkir.cities';
+
+    protected const CACHE_TAG_DISTRICTS = 'rajaongkir.districts';
+
+    protected const CACHE_TAG_SUBDISTRICTS = 'rajaongkir.subdistricts';
+
+    protected const CACHE_TAG_COSTS = 'rajaongkir.costs';
 
     /**
      * Constructor to initialize cache durations from config
@@ -50,7 +55,6 @@ class RajaOngkir {
 
     /**
      * Get provinces
-     * @return array
      */
     public function getProvinces(): array
     {
@@ -60,75 +64,69 @@ class RajaOngkir {
             ->remember($cacheKey, $this->locationCacheDuration, function () {
                 $path = '/province';
                 $response = Api::api($path, 'get')->data();
+
                 return $response;
             });
     }
 
     /**
      * Get cities
-     * @param int $provinceId
-     * @return array
      */
     public function getCities(
         int $provinceId,
-    ): array
-    {
+    ): array {
         $cacheKey = "rajaongkir.cities.province_{$provinceId}";
 
         return Cache::tags([self::CACHE_TAG_LOCATIONS, self::CACHE_TAG_CITIES])
             ->remember($cacheKey, $this->locationCacheDuration, function () use ($provinceId) {
-                $path = '/city/' . $provinceId;
+                $path = '/city/'.$provinceId;
                 $response = Api::api($path, 'get')->data();
+
                 return $response;
             });
     }
 
     /**
      * Get districts
-     * @param int $cityId
-     * @return array
      */
     public function getDistricts(
         int $cityId,
-    ): array
-    {
+    ): array {
         $cacheKey = "rajaongkir.districts.city_{$cityId}";
 
         return Cache::tags([self::CACHE_TAG_LOCATIONS, self::CACHE_TAG_DISTRICTS])
             ->remember($cacheKey, $this->locationCacheDuration, function () use ($cityId) {
-                $path = '/district/' . $cityId;
+                $path = '/district/'.$cityId;
                 $response = Api::api($path, 'get')->data();
+
                 return $response;
             });
     }
 
     /**
      * Get subdistricts
-     * @param int $districtId
-     * @return array
      */
     public function getSubdistricts(
         int $districtId,
-    ): array
-    {
+    ): array {
         $cacheKey = "rajaongkir.subdistricts.district_{$districtId}";
 
         return Cache::tags([self::CACHE_TAG_LOCATIONS, self::CACHE_TAG_SUBDISTRICTS])
             ->remember($cacheKey, $this->locationCacheDuration, function () use ($districtId) {
-                $path = '/subdistrict/' . $districtId;
+                $path = '/subdistrict/'.$districtId;
                 $response = Api::api($path, 'get')->data();
+
                 return $response;
             });
     }
 
     /**
      * District Calculate Cost
-     * @param int $originId origin district id
-     * @param int $destinationId destination district id
-     * @param int $weight weight in grams
-     * @param array $courier courier codes array (Courier enum objects or strings)
-     * @param string|null $sortBy
-     * @return array
+     *
+     * @param  int  $originId  origin district id
+     * @param  int  $destinationId  destination district id
+     * @param  int  $weight  weight in grams
+     * @param  array  $courier  courier codes array (Courier enum objects or strings)
      */
     public function calculateDistrictCost(
         int $originId,
@@ -136,8 +134,7 @@ class RajaOngkir {
         int $weight,
         array $courier,
         ?string $sortBy = 'lowest'
-    ): array
-    {
+    ): array {
         // Convert courier enums to string values if necessary
         $courierValues = CourierRule::convertCouriersToValues($courier);
 
@@ -147,7 +144,7 @@ class RajaOngkir {
             'destination_id' => $destinationId,
             'weight' => $weight,
             'courier' => $courierValues,
-            'sort_by' => $sortBy
+            'sort_by' => $sortBy,
         ]);
 
         // Validate the request
@@ -170,23 +167,19 @@ class RajaOngkir {
                 $bodies['price'] = $data['sort_by'];
 
                 $response = Api::api($path, 'post', $bodies)->data();
+
                 return $response;
             });
     }
 
     /**
      * Search domestic destinations
-     * @param string $search
-     * @param int|null $limit
-     * @param int|null $offset
-     * @return array
      */
     public function searchDomesticDestinations(
         string $search,
         ?int $limit = 10,
         ?int $offset = 0,
-    ): array
-    {
+    ): array {
         $path = '/destination/domestic-destination';
         $params = [
             'search' => $search,
@@ -194,7 +187,8 @@ class RajaOngkir {
             'offset' => $offset,
         ];
 
-        $cacheKey = 'rajaongkir.search_destinations.' . md5(serialize($params));
+        $cacheKey = 'rajaongkir.search_destinations.'.md5(serialize($params));
+
         return Cache::tags([self::CACHE_TAG_LOCATIONS])
             ->remember($cacheKey, $this->locationCacheDuration, function () use ($path, $params) {
                 return Api::api($path, 'get', params: $params)->data();
@@ -203,17 +197,12 @@ class RajaOngkir {
 
     /**
      * Search international destinations
-     * @param string $search
-     * @param int|null $limit
-     * @param int|null $offset
-     * @return array
      */
     public function searchInternationalDestinations(
         string $search,
         ?int $limit = 10,
         ?int $offset = 0,
-    ): array
-    {
+    ): array {
         $path = '/destination/international-destination';
         $params = [
             'search' => $search,
@@ -221,7 +210,8 @@ class RajaOngkir {
             'offset' => $offset,
         ];
 
-        $cacheKey = 'rajaongkir.search_international_destinations.' . md5(serialize($params));
+        $cacheKey = 'rajaongkir.search_international_destinations.'.md5(serialize($params));
+
         return Cache::tags([self::CACHE_TAG_LOCATIONS])
             ->remember($cacheKey, $this->locationCacheDuration, function () use ($path, $params) {
                 return Api::api($path, 'get', params: $params)->data();
@@ -230,12 +220,11 @@ class RajaOngkir {
 
     /**
      * Calculate domestic cost
-     * @param int $originId origin id (can be province, city, or district id)
-     * @param int $destinationId destination id (can be province, city, or district id)
-     * @param int $weight weight in grams
-     * @param array $courier courier codes array (Courier enum objects or strings)
-     * @param string|null $sortBy
-     * @return array
+     *
+     * @param  int  $originId  origin id (can be province, city, or district id)
+     * @param  int  $destinationId  destination id (can be province, city, or district id)
+     * @param  int  $weight  weight in grams
+     * @param  array  $courier  courier codes array (Courier enum objects or strings)
      */
     public function calculateDomesticCost(
         int $originId,
@@ -243,8 +232,7 @@ class RajaOngkir {
         int $weight,
         array $courier,
         ?string $sortBy = 'lowest'
-    ): array
-    {
+    ): array {
         // Convert courier enums to string values if necessary
         $courierValues = CourierRule::convertCouriersToValues($courier);
 
@@ -254,7 +242,7 @@ class RajaOngkir {
             'destination_id' => $destinationId,
             'weight' => $weight,
             'courier' => $courierValues,
-            'sort_by' => $sortBy
+            'sort_by' => $sortBy,
         ]);
 
         // Validate the request
@@ -272,6 +260,7 @@ class RajaOngkir {
         $bodies['price'] = $data['sort_by'];
 
         $cacheKey = "rajaongkir.domestic_cost.{$data['origin_id']}.{$data['destination_id']}.{$data['weight']}.{$courierString}.{$data['sort_by']}";
+
         return Cache::tags([self::CACHE_TAG_COSTS])
             ->remember($cacheKey, $this->costCacheDuration, function () use ($path, $bodies) {
                 return Api::api($path, 'post', $bodies)->data();
@@ -280,12 +269,11 @@ class RajaOngkir {
 
     /**
      * Calculate international cost
-     * @param string $originId origin id (country code)
-     * @param string $destinationId destination id (country code)
-     * @param int $weight weight in grams
-     * @param array $courier courier codes array (Courier enum objects or strings)
-     * @param string|null $sortBy
-     * @return array
+     *
+     * @param  string  $originId  origin id (country code)
+     * @param  string  $destinationId  destination id (country code)
+     * @param  int  $weight  weight in grams
+     * @param  array  $courier  courier codes array (Courier enum objects or strings)
      */
     public function calculateInternationalCost(
         string $originId,
@@ -293,8 +281,7 @@ class RajaOngkir {
         int $weight,
         array $courier,
         ?string $sortBy = 'lowest'
-    ): array
-    {
+    ): array {
         // Convert courier enums to string values if necessary
         $courierValues = CourierRule::convertCouriersToValues($courier);
 
@@ -304,7 +291,7 @@ class RajaOngkir {
             'destination_id' => $destinationId,
             'weight' => $weight,
             'courier' => $courierValues,
-            'sort_by' => $sortBy
+            'sort_by' => $sortBy,
         ]);
 
         // Validate the request
@@ -322,6 +309,7 @@ class RajaOngkir {
         $bodies['price'] = $data['sort_by'];
 
         $cacheKey = "rajaongkir.international_cost.{$originId}.{$destinationId}.{$weight}.{$courierString}.{$sortBy}";
+
         return Cache::tags([self::CACHE_TAG_COSTS])
             ->remember($cacheKey, $this->costCacheDuration, function () use ($path, $bodies) {
                 return Api::api($path, 'post', $bodies)->data();
@@ -330,22 +318,20 @@ class RajaOngkir {
 
     /**
      * Track AWB (Airway Bill)
-     * @param string $waybill
-     * @param string|\Komodo\RajaOngkir\Constants\Courier $courier courier code (Courier enum or string)
-     * @param string|null $last_phone_number last 5 digits of recipient's phone number (optional, some couriers require this)
-     * @return array
+     *
+     * @param  string|\Komodo\RajaOngkir\Constants\Courier  $courier  courier code (Courier enum or string)
+     * @param  string|null  $last_phone_number  last 5 digits of recipient's phone number (optional, some couriers require this)
      */
     public function trackAWB(
         string $waybill,
         $courier,
         ?string $last_phone_number = null
-    ): array
-    {
+    ): array {
         // Convert courier enum to string value if necessary
         $courierValue = $courier instanceof \Komodo\RajaOngkir\Constants\Courier ? $courier->value : (string) $courier;
 
         // Validate courier
-        if (!in_array($courierValue, CourierRule::getValidCouriers(), true)) {
+        if (! in_array($courierValue, CourierRule::getValidCouriers(), true)) {
             throw new \InvalidArgumentException("Invalid courier code: {$courierValue}");
         }
 
@@ -355,11 +341,12 @@ class RajaOngkir {
             'courier' => $courierValue,
         ];
 
-        if($last_phone_number) {
+        if ($last_phone_number) {
             $params['last_phone_number'] = $last_phone_number;
         }
 
-        $cacheKey = "rajaongkir.waybill.{$waybill}.{$courierValue}." . ($last_phone_number ? $last_phone_number : 'no_phone');
+        $cacheKey = "rajaongkir.waybill.{$waybill}.{$courierValue}.".($last_phone_number ? $last_phone_number : 'no_phone');
+
         return Cache::tags([self::CACHE_TAG_COSTS])
             ->remember($cacheKey, $this->costCacheDuration, function () use ($path, $params) {
                 return Api::api($path, 'post', params: $params)->data();
@@ -368,21 +355,17 @@ class RajaOngkir {
 
     /**
      * Clear all cached data
-     *
-     * @return void
      */
     public function clearCache(): void
     {
         Cache::tags([
             self::CACHE_TAG_LOCATIONS,
-            self::CACHE_TAG_COSTS
+            self::CACHE_TAG_COSTS,
         ])->flush();
     }
 
     /**
      * Clear location cache (provinces, cities, districts, subdistricts)
-     *
-     * @return void
      */
     public function clearLocationCache(): void
     {
@@ -391,8 +374,6 @@ class RajaOngkir {
 
     /**
      * Clear cost calculation cache
-     *
-     * @return void
      */
     public function clearCostCache(): void
     {
@@ -402,8 +383,7 @@ class RajaOngkir {
     /**
      * Clear specific location type cache
      *
-     * @param string $locationType provinces|cities|districts|subdistricts
-     * @return void
+     * @param  string  $locationType  provinces|cities|districts|subdistricts
      */
     public function clearLocationTypeCache(string $locationType): void
     {
@@ -421,25 +401,21 @@ class RajaOngkir {
 
     /**
      * Set custom cache duration for location data
-     *
-     * @param int $seconds
-     * @return self
      */
     public function setLocationCacheDuration(int $seconds): self
     {
         $this->locationCacheDuration = $seconds;
+
         return $this;
     }
 
     /**
      * Set custom cache duration for cost calculations
-     *
-     * @param int $seconds
-     * @return self
      */
     public function setCostCacheDuration(int $seconds): self
     {
         $this->costCacheDuration = $seconds;
+
         return $this;
     }
 }

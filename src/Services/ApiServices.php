@@ -10,31 +10,24 @@ use Komodo\RajaOngkir\Exceptions\ApiException;
 class ApiServices
 {
     private static ?array $response;
+
     private static ?array $data;
 
     /**
      * Generate header
-     *
-     * @param string $path
-     * @return array
      */
     public static function getHeader(string $path): array
     {
         return [
-            'Content-Type'  => 'application/x-www-form-urlencoded',
-            'Accept'        => 'application/json',
-            'Location'      => $path,
-            'key'           => config('rajaongkir.api_key'),
+            'Content-Type' => 'application/x-www-form-urlencoded',
+            'Accept' => 'application/json',
+            'Location' => $path,
+            'key' => config('rajaongkir.api_key'),
         ];
     }
 
     /**
      * Api generator
-     *
-     * @param string $path
-     * @param string $method
-     * @param array $bodies
-     * @return ApiServices
      */
     public static function api(string $path, string $method, array $bodies = [], array $params = []): ApiServices
     {
@@ -49,7 +42,7 @@ class ApiServices
             if ($res->status() < 500) {
                 throw ApiException::fromResponse($res->body(), $res->status());
             } else {
-                throw new ApiException(__("rajaongkir::rajaongkir.api.500"), 500);
+                throw new ApiException(__('rajaongkir::rajaongkir.api.500'), 500);
             }
         }
 
@@ -57,8 +50,8 @@ class ApiServices
         self::$data = self::dataToArray($res->json());
 
         // make sure the data is not empty or null
-        if(is_null(self::$data) || empty(self::$data)){
-            throw new ApiException(__("rajaongkir::rajaongkir.api.no_data"), 204);
+        if (is_null(self::$data) || empty(self::$data)) {
+            throw new ApiException(__('rajaongkir::rajaongkir.api.no_data'), 204);
         }
 
         return new self;

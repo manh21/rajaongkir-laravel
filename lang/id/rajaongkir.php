@@ -4,7 +4,7 @@ return [
     'validation' => [
         'invalid_courier' => ':attribute harus berupa kode kurir yang valid. Pilihan yang tersedia: :couriers',
         'courier_not_found' => ':attribute yang dipilih tidak didukung.',
-        
+
         // Pesan validasi untuk kalkulasi ongkos kirim
         'origin_required' => 'ID distrik asal wajib diisi.',
         'origin_must_be_integer' => 'ID distrik asal harus berupa angka yang valid.',
@@ -21,12 +21,12 @@ return [
         'courier_must_be_array' => 'Pilihan kurir harus berupa array.',
         'courier_minimum_selection' => 'Minimal satu kurir harus dipilih.',
         'courier_maximum_selection' => 'Maksimal 5 kurir dapat dipilih sekaligus.',
-                'sort_by_invalid' => 'Opsi sorting harus "lowest" atau "highest".',
+        'sort_by_invalid' => 'Opsi sorting harus "lowest" atau "highest".',
     ],
 
     'attributes' => [
         'origin_id' => 'distrik asal',
-        'destination_id' => 'distrik tujuan', 
+        'destination_id' => 'distrik tujuan',
         'weight' => 'berat paket',
         'courier' => 'kurir',
         'sort_by' => 'opsi sorting',

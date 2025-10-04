@@ -4,7 +4,7 @@ return [
     'validation' => [
         'invalid_courier' => 'The :attribute must be a valid courier code. Valid options are: :couriers',
         'courier_not_found' => 'The selected :attribute is not supported.',
-        
+
         // Calculate cost validation messages
         'origin_required' => 'Origin district ID is required.',
         'origin_must_be_integer' => 'Origin district ID must be a valid integer.',
@@ -26,7 +26,7 @@ return [
 
     'attributes' => [
         'origin_id' => 'origin district',
-        'destination_id' => 'destination district', 
+        'destination_id' => 'destination district',
         'weight' => 'package weight',
         'courier' => 'courier',
         'sort_by' => 'sort option',

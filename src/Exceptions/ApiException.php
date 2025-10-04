@@ -11,6 +11,7 @@ class ApiException extends RuntimeException
             return $this->response;
         }
     }
+
     private ?int $statusCode {
         get {
             return $this->statusCode;
@@ -48,9 +49,6 @@ class ApiException extends RuntimeException
 
     /**
      * Check if the response indicates a failed API call
-     *
-     * @param array $response
-     * @return bool
      */
     public static function isErrorResponse(array $response): bool
     {
@@ -61,5 +59,4 @@ class ApiException extends RuntimeException
 
         return false;
     }
-
 }

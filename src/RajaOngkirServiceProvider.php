@@ -2,9 +2,9 @@
 
 namespace Komodo\RajaOngkir;
 
+use Komodo\RajaOngkir\Commands\RajaOngkirCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Komodo\RajaOngkir\Commands\RajaOngkirCommand;
 
 class RajaOngkirServiceProvider extends PackageServiceProvider
 {

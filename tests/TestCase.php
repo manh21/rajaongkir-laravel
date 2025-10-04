@@ -3,8 +3,8 @@
 namespace Komodo\RajaOngkir\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Orchestra\Testbench\TestCase as Orchestra;
 use Komodo\RajaOngkir\RajaOngkirServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
