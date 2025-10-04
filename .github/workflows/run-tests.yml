@@ -21,7 +21,7 @@ jobs:
       fail-fast: true
       matrix:
         os: [ubuntu-latest, windows-latest]
-        php: [8.4, 8.3]
+        php: [8.4, 8.3, 8.2]
         laravel: [12.*, 11.*]
         stability: [prefer-lowest, prefer-stable]
         include:
@@ -29,8 +29,11 @@ jobs:
             testbench: 10.*
           - laravel: 11.*
             testbench: 9.*
+        exclude:
+          - php: 8.2
+            laravel: 12.*
 
-    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
+    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
     steps:
       - name: Checkout code
@@ -48,6 +51,17 @@ jobs:
           echo "::add-matcher::${{ runner.tool_cache }}/php.json"
           echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
@@ -56,5 +70,27 @@ jobs:
       - name: List Installed Dependencies
         run: composer show -D
 
+      - name: Check translation files exist
+        run: |
+          if [ ! -f "resources/lang/en/rajaongkir.php" ]; then
+            echo "English translation file not found!"
+            exit 1
+          fi
+          if [ ! -f "resources/lang/id/rajaongkir.php" ]; then
+            echo "Indonesian translation file not found!"
+            exit 1
+          fi
+        shell: bash
+
       - name: Execute tests
         run: vendor/bin/pest --ci
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ":memory:"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-results-${{ matrix.php }}-${{ matrix.laravel }}-${{ matrix.os }}
+          path: build/

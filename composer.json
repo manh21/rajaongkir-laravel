@@ -2,9 +2,13 @@
     "name": "manh21/rajaongkir-laravel",
     "description": "RajaOngkir Komerce Laravel Package adalah package PHP yang menyediakan integrasi mudah dan lengkap dengan API RajaOngkir V2 by Komerce. Package ini dirancang khusus untuk aplikasi Laravel dengan fitur-fitur modern seperti caching, validasi, dan dukungan multi-bahasa.",
     "keywords": [
-        "Naufal Hakim",
+        "naufal-hakim",
         "laravel",
-        "rajaongkir-laravel"
+        "rajaongkir-laravel",
+        "rajaongkir",
+        "shipping",
+        "logistics",
+        "indonesia"
     ],
     "homepage": "https://github.com/manh21/rajaongkir-laravel",
     "license": "MIT",
@@ -16,7 +20,7 @@
         }
     ],
     "require": {
-        "php": "^8.4",
+        "php": "^8.2|^8.3|^8.4",
         "spatie/laravel-package-tools": "^1.16",
         "illuminate/contracts": "^11.0||^12.0"
     },
@@ -24,7 +28,7 @@
         "laravel/pint": "^1.14",
         "nunomaduro/collision": "^8.8",
         "larastan/larastan": "^3.0",
-        "orchestra/testbench": "^10.0.0||^9.0.0",
+        "orchestra/testbench": "^9.0.0||^10.0.0",
         "pestphp/pest": "^4.0",
         "pestphp/pest-plugin-arch": "^4.0",
         "pestphp/pest-plugin-laravel": "^4.0",

@@ -2,22 +2,28 @@
 
 namespace Komodo\RajaOngkir\Rules;
 
-use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\ImplicitRule;
 use Komodo\RajaOngkir\Constants\Courier;
 
-class CourierRule implements ValidationRule
+class CourierRule implements ImplicitRule
 {
-    public function validate(string $attribute, $value, Closure $fail): void
+    /**
+     * Determine if the validation rule passes.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function passes($attribute, $value)
     {
-        // Check if value is null or not a string or Courier enum
-        if (empty($value) || is_null($value) || $value === '' || (! is_string($value) && ! $value instanceof Courier)) {
-            $fail(__('rajaongkir::rajaongkir.validation.invalid_courier', [
-                'attribute' => $attribute,
-                'couriers' => implode(', ', self::getValidCouriers()),
-            ]));
+        // Check for empty values first (these should fail)
+        if (empty($value) || is_null($value) || $value === '') {
+            return false;
+        }
 
-            return;
+        // Check if value is not a string or Courier enum
+        if (! is_string($value) && ! $value instanceof Courier) {
+            return false;
         }
 
         // Convert enum to string value if it's a Courier enum
@@ -26,12 +32,19 @@ class CourierRule implements ValidationRule
         // Get all valid courier codes from the enum
         $validCouriers = array_column(Courier::cases(), 'value');
 
-        if (! in_array($courierValue, $validCouriers, true)) {
-            $fail(__('rajaongkir::rajaongkir.validation.invalid_courier', [
-                'attribute' => $attribute,
-                'couriers' => implode(', ', $validCouriers),
-            ]));
-        }
+        return in_array($courierValue, $validCouriers, true);
+    }
+
+    /**
+     * Get the validation error message.
+     *
+     * @return string
+     */
+    public function message()
+    {
+        return __('rajaongkir::rajaongkir.validation.invalid_courier', [
+            'couriers' => implode(', ', self::getValidCouriers()),
+        ]);
     }
 
     /**
