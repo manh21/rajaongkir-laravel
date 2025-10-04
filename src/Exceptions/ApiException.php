@@ -6,28 +6,23 @@ use RuntimeException;
 
 class ApiException extends RuntimeException
 {
-    private ?array $response {
-        get {
-            return $this->response;
-        }
-    }
-
-    private ?int $statusCode {
-        get {
-            return $this->statusCode;
-        }
-    }
-
     public function __construct(
         string $message = '',
         int $code = 0,
-        ?array $response = null,
+        private readonly ?array $response = null,
         ?\Throwable $previous = null
     ) {
-        $this->response = $response;
-        $this->statusCode = $code;
-
         parent::__construct($message, $code, $previous);
+    }
+
+    public function getResponse(): ?array
+    {
+        return $this->response;
+    }
+
+    public function getStatusCode(): int
+    {
+        return $this->getCode();
     }
 
     public static function fromResponse($response, int $statusCode = 500, ?\Throwable $previous = null): self

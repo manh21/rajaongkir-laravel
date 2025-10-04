@@ -2,28 +2,52 @@
 
 namespace Komodo\RajaOngkir\Rules;
 
-use Illuminate\Contracts\Validation\ImplicitRule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\ValidatorAwareRule;
+use Illuminate\Validation\Validator;
 use Komodo\RajaOngkir\Constants\Courier;
 
-class CourierRule implements ImplicitRule
+class CourierRule implements ValidationRule, ValidatorAwareRule
 {
+    protected ?Validator $validator = null;
+
     /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
+     * Set the current validator.
      */
-    public function passes($attribute, $value)
+    public function setValidator(Validator $validator): static
     {
+        $this->validator = $validator;
+
+        return $this;
+    }
+
+    /**
+     * Run the validation rule.
+     *
+     * @param  Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     */
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        // Always validate, even for empty values (implicit rule behavior)
         // Check for empty values first (these should fail)
-        if (empty($value) || is_null($value) || $value === '') {
-            return false;
+        if ($value === null || $value === '' || (is_string($value) && trim($value) === '')) {
+            $fail(__('rajaongkir::rajaongkir.validation.invalid_courier', [
+                'attribute' => $attribute,
+                'couriers' => implode(', ', self::getValidCouriers()),
+            ]));
+
+            return;
         }
 
         // Check if value is not a string or Courier enum
         if (! is_string($value) && ! $value instanceof Courier) {
-            return false;
+            $fail(__('rajaongkir::rajaongkir.validation.invalid_courier', [
+                'attribute' => $attribute,
+                'couriers' => implode(', ', self::getValidCouriers()),
+            ]));
+
+            return;
         }
 
         // Convert enum to string value if it's a Courier enum
@@ -32,19 +56,12 @@ class CourierRule implements ImplicitRule
         // Get all valid courier codes from the enum
         $validCouriers = array_column(Courier::cases(), 'value');
 
-        return in_array($courierValue, $validCouriers, true);
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return __('rajaongkir::rajaongkir.validation.invalid_courier', [
-            'couriers' => implode(', ', self::getValidCouriers()),
-        ]);
+        if (! in_array($courierValue, $validCouriers, true)) {
+            $fail(__('rajaongkir::rajaongkir.validation.invalid_courier', [
+                'attribute' => $attribute,
+                'couriers' => implode(', ', $validCouriers),
+            ]));
+        }
     }
 
     /**
