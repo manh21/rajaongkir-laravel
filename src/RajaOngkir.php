@@ -53,13 +53,38 @@ class RajaOngkir
     }
 
     /**
+     * Check if the current cache driver supports tagging
+     */
+    protected function cacheSupportsTagging(): bool
+    {
+        try {
+            $store = Cache::getStore();
+            return method_exists($store, 'tags') && in_array('Illuminate\Contracts\Cache\TaggableStore', class_implements($store));
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Get cache instance with optional tagging support
+     */
+    protected function getCacheInstance(array $tags = []): \Illuminate\Contracts\Cache\Repository
+    {
+        if ($this->cacheSupportsTagging() && !empty($tags)) {
+            return Cache::tags($tags);
+        }
+        
+        return Cache::store();
+    }
+
+    /**
      * Get provinces
      */
     public function getProvinces(): array
     {
         $cacheKey = 'rajaongkir.provinces';
 
-        return Cache::tags([self::CACHE_TAG_LOCATIONS, self::CACHE_TAG_PROVINCES])
+        return $this->getCacheInstance([self::CACHE_TAG_LOCATIONS, self::CACHE_TAG_PROVINCES])
             ->remember($cacheKey, $this->locationCacheDuration, function () {
                 $path = '/province';
                 $response = Api::api($path, 'get')->data();
@@ -76,7 +101,7 @@ class RajaOngkir
     ): array {
         $cacheKey = "rajaongkir.cities.province_{$provinceId}";
 
-        return Cache::tags([self::CACHE_TAG_LOCATIONS, self::CACHE_TAG_CITIES])
+        return $this->getCacheInstance([self::CACHE_TAG_LOCATIONS, self::CACHE_TAG_CITIES])
             ->remember($cacheKey, $this->locationCacheDuration, function () use ($provinceId) {
                 $path = '/city/'.$provinceId;
                 $response = Api::api($path, 'get')->data();
@@ -93,7 +118,7 @@ class RajaOngkir
     ): array {
         $cacheKey = "rajaongkir.districts.city_{$cityId}";
 
-        return Cache::tags([self::CACHE_TAG_LOCATIONS, self::CACHE_TAG_DISTRICTS])
+        return $this->getCacheInstance([self::CACHE_TAG_LOCATIONS, self::CACHE_TAG_DISTRICTS])
             ->remember($cacheKey, $this->locationCacheDuration, function () use ($cityId) {
                 $path = '/district/'.$cityId;
                 $response = Api::api($path, 'get')->data();
@@ -110,7 +135,7 @@ class RajaOngkir
     ): array {
         $cacheKey = "rajaongkir.subdistricts.district_{$districtId}";
 
-        return Cache::tags([self::CACHE_TAG_LOCATIONS, self::CACHE_TAG_SUBDISTRICTS])
+        return $this->getCacheInstance([self::CACHE_TAG_LOCATIONS, self::CACHE_TAG_SUBDISTRICTS])
             ->remember($cacheKey, $this->locationCacheDuration, function () use ($districtId) {
                 $path = '/subdistrict/'.$districtId;
                 $response = Api::api($path, 'get')->data();
@@ -157,7 +182,7 @@ class RajaOngkir
         $courierString = implode(':', $data['courier']);
         $cacheKey = "rajaongkir.cost.{$data['origin_id']}.{$data['destination_id']}.{$data['weight']}.{$courierString}.{$data['sort_by']}";
 
-        return Cache::tags([self::CACHE_TAG_COSTS])
+        return $this->getCacheInstance([self::CACHE_TAG_COSTS])
             ->remember($cacheKey, $this->costCacheDuration, function () use ($data, $courierString) {
                 $bodies = [];
                 $path = '/calculate/district/domestic-cost';
@@ -191,7 +216,7 @@ class RajaOngkir
 
         $cacheKey = 'rajaongkir.search_destinations.'.md5(serialize($params));
 
-        return Cache::tags([self::CACHE_TAG_LOCATIONS])
+        return $this->getCacheInstance([self::CACHE_TAG_LOCATIONS])
             ->remember($cacheKey, $this->locationCacheDuration, function () use ($path, $params) {
                 return Api::api($path, 'get', params: $params)->data();
             });
@@ -214,7 +239,7 @@ class RajaOngkir
 
         $cacheKey = 'rajaongkir.search_international_destinations.'.md5(serialize($params));
 
-        return Cache::tags([self::CACHE_TAG_LOCATIONS])
+        return $this->getCacheInstance([self::CACHE_TAG_LOCATIONS])
             ->remember($cacheKey, $this->locationCacheDuration, function () use ($path, $params) {
                 return Api::api($path, 'get', params: $params)->data();
             });
@@ -266,7 +291,7 @@ class RajaOngkir
 
         $cacheKey = "rajaongkir.domestic_cost.{$data['origin_id']}.{$data['destination_id']}.{$data['weight']}.{$courierString}.{$data['sort_by']}";
 
-        return Cache::tags([self::CACHE_TAG_COSTS])
+        return $this->getCacheInstance([self::CACHE_TAG_COSTS])
             ->remember($cacheKey, $this->costCacheDuration, function () use ($path, $bodies) {
                 return Api::api($path, 'post', $bodies)->data();
             });
@@ -318,7 +343,7 @@ class RajaOngkir
 
         $cacheKey = "rajaongkir.international_cost.{$originId}.{$destinationId}.{$weight}.{$courierString}.{$sortBy}";
 
-        return Cache::tags([self::CACHE_TAG_COSTS])
+        return $this->getCacheInstance([self::CACHE_TAG_COSTS])
             ->remember($cacheKey, $this->costCacheDuration, function () use ($path, $bodies) {
                 return Api::api($path, 'post', $bodies)->data();
             });
@@ -355,7 +380,7 @@ class RajaOngkir
 
         $cacheKey = "rajaongkir.waybill.{$waybill}.{$courierValue}.".($last_phone_number ? $last_phone_number : 'no_phone');
 
-        return Cache::tags([self::CACHE_TAG_COSTS])
+        return $this->getCacheInstance([self::CACHE_TAG_COSTS])
             ->remember($cacheKey, $this->costCacheDuration, function () use ($path, $params) {
                 return Api::api($path, 'post', params: $params)->data();
             });
@@ -366,10 +391,15 @@ class RajaOngkir
      */
     public function clearCache(): void
     {
-        Cache::tags([
-            self::CACHE_TAG_LOCATIONS,
-            self::CACHE_TAG_COSTS,
-        ])->flush();
+        if ($this->cacheSupportsTagging()) {
+            Cache::tags([
+                self::CACHE_TAG_LOCATIONS,
+                self::CACHE_TAG_COSTS,
+            ])->flush();
+        } else {
+            // For non-tagging cache stores, we can only flush all cache or use cache patterns if supported
+            Cache::flush();
+        }
     }
 
     /**
@@ -377,7 +407,12 @@ class RajaOngkir
      */
     public function clearLocationCache(): void
     {
-        Cache::tags([self::CACHE_TAG_LOCATIONS])->flush();
+        if ($this->cacheSupportsTagging()) {
+            Cache::tags([self::CACHE_TAG_LOCATIONS])->flush();
+        } else {
+            // For non-tagging stores, clear specific known location cache keys
+            $this->clearLocationCacheKeys();
+        }
     }
 
     /**
@@ -385,7 +420,26 @@ class RajaOngkir
      */
     public function clearCostCache(): void
     {
-        Cache::tags([self::CACHE_TAG_COSTS])->flush();
+        if ($this->cacheSupportsTagging()) {
+            Cache::tags([self::CACHE_TAG_COSTS])->flush();
+        } else {
+            // For non-tagging stores, we can only flush all cache
+            // Cost cache keys are too dynamic to track individually
+            Cache::flush();
+        }
+    }
+
+    /**
+     * Clear specific location cache keys for non-tagging stores
+     */
+    protected function clearLocationCacheKeys(): void
+    {
+        // Clear provinces cache
+        Cache::forget('rajaongkir.provinces');
+        
+        // Note: We cannot efficiently clear all city/district/subdistrict caches 
+        // without tagging support as the keys are dynamic.
+        // In practice, users should consider using Redis/Memcached for better cache management.
     }
 
     /**
@@ -395,15 +449,23 @@ class RajaOngkir
      */
     public function clearLocationTypeCache(string $locationType): void
     {
-        $tagMap = [
-            'provinces' => self::CACHE_TAG_PROVINCES,
-            'cities' => self::CACHE_TAG_CITIES,
-            'districts' => self::CACHE_TAG_DISTRICTS,
-            'subdistricts' => self::CACHE_TAG_SUBDISTRICTS,
-        ];
+        if ($this->cacheSupportsTagging()) {
+            $tagMap = [
+                'provinces' => self::CACHE_TAG_PROVINCES,
+                'cities' => self::CACHE_TAG_CITIES,
+                'districts' => self::CACHE_TAG_DISTRICTS,
+                'subdistricts' => self::CACHE_TAG_SUBDISTRICTS,
+            ];
 
-        if (isset($tagMap[$locationType])) {
-            Cache::tags([$tagMap[$locationType]])->flush();
+            if (isset($tagMap[$locationType])) {
+                Cache::tags([$tagMap[$locationType]])->flush();
+            }
+        } else {
+            // For non-tagging stores, only handle provinces specifically
+            if ($locationType === 'provinces') {
+                Cache::forget('rajaongkir.provinces');
+            }
+            // Other location types have dynamic keys and cannot be cleared efficiently
         }
     }
 
