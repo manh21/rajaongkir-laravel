@@ -2,11 +2,7 @@
 
 namespace Komodo\RajaOngkir;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Komodo\RajaOngkir\Exceptions\ApiException;
 use Komodo\RajaOngkir\Facades\Api;
 use Komodo\RajaOngkir\Requests\CalculateCostRequest;
 use Komodo\RajaOngkir\Rules\CourierRule;
@@ -144,7 +140,7 @@ class RajaOngkir {
     {
         // Convert courier enums to string values if necessary
         $courierValues = CourierRule::convertCouriersToValues($courier);
-        
+
         // Create a request instance with the provided data
         $request = new CalculateCostRequest([
             'origin_id' => $originId,
@@ -251,7 +247,7 @@ class RajaOngkir {
     {
         // Convert courier enums to string values if necessary
         $courierValues = CourierRule::convertCouriersToValues($courier);
-        
+
         // Create a request instance with the provided data
         $request = new CalculateCostRequest([
             'origin_id' => $originId,
@@ -301,7 +297,7 @@ class RajaOngkir {
     {
         // Convert courier enums to string values if necessary
         $courierValues = CourierRule::convertCouriersToValues($courier);
-        
+
         // Create a request instance with the provided data
         $request = new CalculateCostRequest([
             'origin_id' => $originId,
@@ -346,14 +342,13 @@ class RajaOngkir {
     ): array
     {
         // Convert courier enum to string value if necessary
-        use Komodo\RajaOngkir\Constants\Courier;
-        $courierValue = $courier instanceof Courier ? $courier->value : (string) $courier;
-        
+        $courierValue = $courier instanceof \Komodo\RajaOngkir\Constants\Courier ? $courier->value : (string) $courier;
+
         // Validate courier
         if (!in_array($courierValue, CourierRule::getValidCouriers(), true)) {
             throw new \InvalidArgumentException("Invalid courier code: {$courierValue}");
         }
-        
+
         $path = '/track/waybill';
         $params = [
             'waybill' => $waybill,
@@ -367,7 +362,7 @@ class RajaOngkir {
         $cacheKey = "rajaongkir.waybill.{$waybill}.{$courierValue}." . ($last_phone_number ? $last_phone_number : 'no_phone');
         return Cache::tags([self::CACHE_TAG_COSTS])
             ->remember($cacheKey, $this->costCacheDuration, function () use ($path, $params) {
-                return Api::api($path, 'post', param: $params)->data();
+                return Api::api($path, 'post', params: $params)->data();
             });
     }
 
