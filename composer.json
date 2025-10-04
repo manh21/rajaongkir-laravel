@@ -34,13 +34,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Komodo\\RajaOngkirLaravel\\": "src/",
-            "Komodo\\RajaOngkirLaravel\\Database\\Factories\\": "database/factories/"
+            "Komodo\\RajaOngkir\\": "src/",
+            "Komodo\\RajaOngkir\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Komodo\\RajaOngkirLaravel\\Tests\\": "tests/",
+            "Komodo\\RajaOngkir\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/"
         }
     },
@@ -62,10 +62,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Komodo\\RajaOngkirLaravel\\RajaOngkirLaravelServiceProvider"
+                "Komodo\\RajaOngkir\\RajaOngkirServiceProvider"
             ],
             "aliases": {
-                "RajaOngkirLaravel": "Komodo\\RajaOngkirLaravel\\Facades\\RajaOngkirLaravel"
+                "RajaOngkir": "Komodo\\RajaOngkir\\Facades\\RajaOngkir"
             }
         }
     },

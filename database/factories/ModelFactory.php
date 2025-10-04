@@ -1,6 +1,6 @@
 <?php
 
-namespace Komodo\RajaOngkirLaravel\Database\Factories;
+namespace Komodo\RajaOngkir\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 

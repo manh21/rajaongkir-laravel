@@ -52,7 +52,7 @@ php artisan vendor:publish --tag="rajaongkir-laravel-views"
 ## Usage
 
 ```php
-$rajaongkirLaravel = new Komodo\RajaOngkirLaravel();
+$rajaongkirLaravel = new Komodo\RajaOngkir();
 echo $rajaongkirLaravel->echoPhrase('Hello, Komodo!');
 ```
 
