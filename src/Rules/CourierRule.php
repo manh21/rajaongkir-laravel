@@ -10,15 +10,33 @@ class CourierRule implements ValidationRule
 {
     public function validate(string $attribute, $value, Closure $fail): void
     {
+        // Convert enum to string value if it's a Courier enum
+        $courierValue = $this->getCourierValue($value);
+        
         // Get all valid courier codes from the enum
         $validCouriers = array_column(Courier::cases(), 'value');
         
-        if (!in_array($value, $validCouriers, true)) {
+        if (!in_array($courierValue, $validCouriers, true)) {
             $fail(__('rajaongkir::rajaongkir.validation.invalid_courier', [
                 'attribute' => $attribute,
                 'couriers' => implode(', ', $validCouriers)
             ]));
         }
+    }
+    
+    /**
+     * Convert courier enum or string to string value
+     *
+     * @param mixed $courier
+     * @return string
+     */
+    protected function getCourierValue($courier): string
+    {
+        if ($courier instanceof Courier) {
+            return $courier->value;
+        }
+        
+        return (string) $courier;
     }
     
     /**
@@ -29,6 +47,63 @@ class CourierRule implements ValidationRule
     public static function getValidCouriers(): array
     {
         return array_column(Courier::cases(), 'value');
+    }
+    
+    /**
+     * Convert array of courier enums or strings to array of string values
+     *
+     * @param array $couriers Array of Courier enums or strings
+     * @return array<string>
+     */
+    public static function convertCouriersToValues(array $couriers): array
+    {
+        return array_map(function ($courier) {
+            if ($courier instanceof Courier) {
+                return $courier->value;
+            }
+            return (string) $courier;
+        }, $couriers);
+    }
+    
+    /**
+     * Validate array of courier enums or strings
+     *
+     * @param array $couriers Array of Courier enums or strings
+     * @return bool
+     */
+    public static function validateCouriers(array $couriers): bool
+    {
+        $validCouriers = self::getValidCouriers();
+        $courierValues = self::convertCouriersToValues($couriers);
+        
+        foreach ($courierValues as $courier) {
+            if (!in_array($courier, $validCouriers, true)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Get invalid couriers from array
+     *
+     * @param array $couriers Array of Courier enums or strings
+     * @return array<string> Invalid courier codes
+     */
+    public static function getInvalidCouriers(array $couriers): array
+    {
+        $validCouriers = self::getValidCouriers();
+        $courierValues = self::convertCouriersToValues($couriers);
+        $invalidCouriers = [];
+        
+        foreach ($courierValues as $courier) {
+            if (!in_array($courier, $validCouriers, true)) {
+                $invalidCouriers[] = $courier;
+            }
+        }
+        
+        return array_unique($invalidCouriers);
     }
     
     /**

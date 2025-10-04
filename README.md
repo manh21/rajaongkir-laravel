@@ -91,16 +91,39 @@ $subdistricts = $rajaongkir->getSubdistricts(1234);
 #### Menggunakan Individual Parameters
 
 ```php
+// Menggunakan Courier Enum (Recommended)
 $cost = $rajaongkir->calculateDistrictCost(
     originId: 152,           // ID Kecamatan asal
     destinationId: 153,      // ID Kecamatan tujuan
     weight: 1000,           // Berat dalam gram (1kg)
-    courier: [              // Array kurir
-        Courier::JNE->value,
-        Courier::TIKI->value,
-        Courier::SICEPAT->value
+    courier: [              // Array kurir enum
+        Courier::JNE,
+        Courier::TIKI,
+        Courier::SICEPAT
     ],
     sortBy: 'lowest'        // Urutkan berdasarkan harga terendah
+);
+
+// Atau menggunakan string values
+$cost = $rajaongkir->calculateDistrictCost(
+    originId: 152,
+    destinationId: 153,
+    weight: 1000,
+    courier: ['jne', 'tiki', 'sicepat'], // Array string
+    sortBy: 'lowest'
+);
+
+// Mix enum dan string juga didukung
+$cost = $rajaongkir->calculateDistrictCost(
+    originId: 152,
+    destinationId: 153,
+    weight: 1000,
+    courier: [
+        Courier::JNE,      // Enum
+        'tiki',            // String
+        Courier::SICEPAT   // Enum
+    ],
+    sortBy: 'lowest'
 );
 ```
 
@@ -121,17 +144,16 @@ public function calculateCost(CalculateCostRequest $request, Rajaongkir $rajaong
 }
 ```
 
-### Menggunakan Courier Enum
+### Menggunakan Courier Enum & Validasi
 
 ```php
 use Komodo\RajaOngkir\Constants\Courier;
+use Komodo\RajaOngkir\Rules\CourierRule;
 
 // Menggunakan enum untuk type safety
 $courierCode = Courier::JNE->value; // 'jne'
 
 // Cek kemampuan kurir
-use Komodo\RajaOngkir\Rules\CourierRule;
-
 if (CourierRule::supportsInternationalCost('jne')) {
     // JNE mendukung ongkir internasional
 }
@@ -139,6 +161,60 @@ if (CourierRule::supportsInternationalCost('jne')) {
 if (CourierRule::supportsAwb('sicepat')) {
     // SiCepat mendukung pelacakan resi
 }
+
+// Validasi array kurir (mixed enum & string)
+$couriers = [Courier::JNE, 'tiki', Courier::SICEPAT];
+
+if (CourierRule::validateCouriers($couriers)) {
+    // Semua kurir valid
+    $courierValues = CourierRule::convertCouriersToValues($couriers);
+    // Result: ['jne', 'tiki', 'sicepat']
+}
+
+// Cek kurir yang tidak valid
+$invalidCouriers = CourierRule::getInvalidCouriers(['jne', 'invalid', 'tiki']);
+// Result: ['invalid']
+```
+
+### Pelacakan Resi (AWB Tracking)
+
+```php
+// Menggunakan Courier enum
+$tracking = $rajaongkir->trackAWB(
+    waybill: 'JNE123456789',
+    courier: Courier::JNE
+);
+
+// Menggunakan string
+$tracking = $rajaongkir->trackAWB(
+    waybill: 'TIKI987654321',
+    courier: 'tiki'
+);
+
+// Dengan nomor telepon (untuk kurir tertentu)
+$tracking = $rajaongkir->trackAWB(
+    waybill: 'SICEPAT123456',
+    courier: Courier::SICEPAT,
+    last_phone_number: '12345' // 5 digit terakhir nomor penerima
+);
+```
+
+### Pencarian Destinasi
+
+```php
+// Pencarian destinasi domestik
+$destinations = $rajaongkir->searchDomesticDestinations(
+    search: 'Jakarta',
+    limit: 10,
+    offset: 0
+);
+
+// Pencarian destinasi internasional
+$intlDestinations = $rajaongkir->searchInternationalDestinations(
+    search: 'Singapore',
+    limit: 10,
+    offset: 0
+);
 ```
 
 ### Cache Management

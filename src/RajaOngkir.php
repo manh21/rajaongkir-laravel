@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Komodo\RajaOngkir\Exceptions\ApiException;
 use Komodo\RajaOngkir\Facades\Api;
 use Komodo\RajaOngkir\Requests\CalculateCostRequest;
+use Komodo\RajaOngkir\Rules\CourierRule;
 
 class RajaOngkir {
     /**
@@ -129,7 +130,7 @@ class RajaOngkir {
      * @param int $originId origin district id
      * @param int $destinationId destination district id
      * @param int $weight weight in grams
-     * @param array $courier courier codes array (can be obtained from Courier enum)
+     * @param array $courier courier codes array (Courier enum objects or strings)
      * @param string|null $sortBy
      * @return array
      */
@@ -141,12 +142,15 @@ class RajaOngkir {
         ?string $sortBy = 'lowest'
     ): array
     {
+        // Convert courier enums to string values if necessary
+        $courierValues = CourierRule::convertCouriersToValues($courier);
+        
         // Create a request instance with the provided data
         $request = new CalculateCostRequest([
             'origin_id' => $originId,
             'destination_id' => $destinationId,
             'weight' => $weight,
-            'courier' => $courier,
+            'courier' => $courierValues,
             'sort_by' => $sortBy
         ]);
 
@@ -233,7 +237,7 @@ class RajaOngkir {
      * @param int $originId origin id (can be province, city, or district id)
      * @param int $destinationId destination id (can be province, city, or district id)
      * @param int $weight weight in grams
-     * @param array $courier courier codes array (can be obtained from Courier enum)
+     * @param array $courier courier codes array (Courier enum objects or strings)
      * @param string|null $sortBy
      * @return array
      */
@@ -245,12 +249,15 @@ class RajaOngkir {
         ?string $sortBy = 'lowest'
     ): array
     {
+        // Convert courier enums to string values if necessary
+        $courierValues = CourierRule::convertCouriersToValues($courier);
+        
         // Create a request instance with the provided data
         $request = new CalculateCostRequest([
             'origin_id' => $originId,
             'destination_id' => $destinationId,
             'weight' => $weight,
-            'courier' => $courier,
+            'courier' => $courierValues,
             'sort_by' => $sortBy
         ]);
 
@@ -260,7 +267,7 @@ class RajaOngkir {
         $data = $request->getCalculateCostData();
 
         $path = '/calculate/domestic-cost';
-        $courierString = implode(':', $courier);
+        $courierString = implode(':', $data['courier']);
 
         $bodies['origin'] = $data['origin_id'];
         $bodies['destination'] = $data['destination_id'];
@@ -280,7 +287,7 @@ class RajaOngkir {
      * @param string $originId origin id (country code)
      * @param string $destinationId destination id (country code)
      * @param int $weight weight in grams
-     * @param array $courier courier codes array (can be obtained from Courier enum)
+     * @param array $courier courier codes array (Courier enum objects or strings)
      * @param string|null $sortBy
      * @return array
      */
@@ -292,12 +299,15 @@ class RajaOngkir {
         ?string $sortBy = 'lowest'
     ): array
     {
+        // Convert courier enums to string values if necessary
+        $courierValues = CourierRule::convertCouriersToValues($courier);
+        
         // Create a request instance with the provided data
         $request = new CalculateCostRequest([
             'origin_id' => $originId,
             'destination_id' => $destinationId,
             'weight' => $weight,
-            'courier' => $courier,
+            'courier' => $courierValues,
             'sort_by' => $sortBy
         ]);
 
@@ -307,7 +317,7 @@ class RajaOngkir {
         $data = $request->getCalculateCostData();
 
         $path = '/calculate/international-cost';
-        $courierString = implode(':', $courier);
+        $courierString = implode(':', $data['courier']);
 
         $bodies['origin'] = $data['origin_id'];
         $bodies['destination'] = $data['destination_id'];
@@ -325,32 +335,36 @@ class RajaOngkir {
     /**
      * Track AWB (Airway Bill)
      * @param string $waybill
-     * @param string $courier courier code from Courier enum
+     * @param string|\Komodo\RajaOngkir\Constants\Courier $courier courier code (Courier enum or string)
      * @param string|null $last_phone_number last 5 digits of recipient's phone number (optional, some couriers require this)
      * @return array
      */
     public function trackAWB(
         string $waybill,
-        string $courier,
+        $courier,
         ?string $last_phone_number = null
     ): array
     {
+        // Convert courier enum to string value if necessary
+        use Komodo\RajaOngkir\Constants\Courier;
+        $courierValue = $courier instanceof Courier ? $courier->value : (string) $courier;
+        
         // Validate courier
-        if (!in_array($courier, \Komodo\RajaOngkir\Constants\Courier::getValidCouriers(), true)) {
-            throw new \InvalidArgumentException("Invalid courier code: {$courier}");
+        if (!in_array($courierValue, CourierRule::getValidCouriers(), true)) {
+            throw new \InvalidArgumentException("Invalid courier code: {$courierValue}");
         }
         
         $path = '/track/waybill';
         $params = [
             'waybill' => $waybill,
-            'courier' => $courier,
+            'courier' => $courierValue,
         ];
 
         if($last_phone_number) {
             $params['last_phone_number'] = $last_phone_number;
         }
 
-        $cacheKey = "rajaongkir.waybill.{$waybill}.{$courier}." . ($last_phone_number ? $last_phone_number : 'no_phone');
+        $cacheKey = "rajaongkir.waybill.{$waybill}.{$courierValue}." . ($last_phone_number ? $last_phone_number : 'no_phone');
         return Cache::tags([self::CACHE_TAG_COSTS])
             ->remember($cacheKey, $this->costCacheDuration, function () use ($path, $params) {
                 return Api::api($path, 'post', param: $params)->data();
