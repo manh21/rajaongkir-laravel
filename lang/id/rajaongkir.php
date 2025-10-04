@@ -1,11 +1,6 @@
 <?php
 
 return [
-    "failed-create-contract" => "Terjadi Kesalahan Pada Server Moota. Lihat file log atau hubungi administrator",
-    "invalid-bank-type" => ":attribute tidak tersedia",
-    "invalid-mutation-type" => ":attribute tidak tersedia",
-    "topup-data-not-valid" => "Topup data tidak sesuai",
-
     'validation' => [
         'invalid_courier' => ':attribute harus berupa kode kurir yang valid. Pilihan yang tersedia: :couriers',
         'courier_not_found' => ':attribute yang dipilih tidak didukung.',
@@ -35,8 +30,6 @@ return [
         'weight' => 'berat paket',
         'courier' => 'kurir',
         'sort_by' => 'opsi sorting',
-    ],
-];
     ],
 
     'api' => [
