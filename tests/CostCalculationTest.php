@@ -12,7 +12,7 @@ beforeEach(function () {
         'cache.default' => 'array',
     ]);
 
-    $this->rajaongkir = new RajaOngkir();
+    $this->rajaongkir = new RajaOngkir;
 
     // Mock successful cost calculation response
     Http::fake([
@@ -20,22 +20,22 @@ beforeEach(function () {
             'status' => 200,
             'data' => [
                 ['province_id' => 1, 'province' => 'Province A'],
-                ['province_id' => 2, 'province' => 'Province B']
-            ]
+                ['province_id' => 2, 'province' => 'Province B'],
+            ],
         ], 200),
         '*/cities/*' => Http::response([
             'status' => 200,
             'data' => [
                 ['city_id' => 1, 'city_name' => 'City A'],
-                ['city_id' => 2, 'city_name' => 'City B']
-            ]
+                ['city_id' => 2, 'city_name' => 'City B'],
+            ],
         ], 200),
         '*/subdistricts/*' => Http::response([
             'status' => 200,
             'data' => [
                 ['subdistrict_id' => 1, 'subdistrict_name' => 'Subdistrict'],
                 ['subdistrict_id' => 2, 'subdistrict_name' => 'Subdistrict B'],
-            ]
+            ],
         ], 200),
         '*/calculate/*' => Http::response([
             'status' => 200,
@@ -48,16 +48,16 @@ beforeEach(function () {
                         'courier' => 'jne',
                         'service' => 'REG',
                         'cost' => 9000,
-                        'etd' => '2-3'
+                        'etd' => '2-3',
                     ],
                     [
                         'courier' => 'tiki',
                         'service' => 'REG',
                         'cost' => 8500,
-                        'etd' => '2-4'
-                    ]
-                ]
-            ]
+                        'etd' => '2-4',
+                    ],
+                ],
+            ],
         ], 200),
 
         '*/track/*' => Http::response([
@@ -67,9 +67,9 @@ beforeEach(function () {
                 'courier' => 'jne',
                 'status' => 'delivered',
                 'history' => [
-                    ['date' => '2023-01-01', 'description' => 'Package delivered']
-                ]
-            ]
+                    ['date' => '2023-01-01', 'description' => 'Package delivered'],
+                ],
+            ],
         ], 200),
     ]);
 });

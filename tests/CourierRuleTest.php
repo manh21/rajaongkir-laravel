@@ -10,7 +10,7 @@ beforeEach(function () {
         'cache.default' => 'array',
     ]);
 
-    $this->rule = new CourierRule();
+    $this->rule = new CourierRule;
 });
 
 describe('CourierRule Validation', function () {
@@ -20,12 +20,12 @@ describe('CourierRule Validation', function () {
     });
 
     it('passes validation with valid enum courier', function () {
-        $validator = Validator::make(['courier' => Courier::JNE], ['courier' => new CourierRule()]);
+        $validator = Validator::make(['courier' => Courier::JNE], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeTrue();
     });
 
     it('passes validation with valid string courier', function () {
-        $validator = Validator::make(['courier' => 'jne'], ['courier' => new CourierRule()]);
+        $validator = Validator::make(['courier' => 'jne'], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeTrue();
     });
 
@@ -33,38 +33,38 @@ describe('CourierRule Validation', function () {
         $validCouriers = ['jne', 'tiki', 'pos', 'sicepat', 'jnt'];
 
         foreach ($validCouriers as $courier) {
-            $validator = Validator::make(['courier' => $courier], ['courier' => new CourierRule()]);
+            $validator = Validator::make(['courier' => $courier], ['courier' => new CourierRule]);
             expect($validator->passes())->toBeTrue();
         }
     });
 
     it('fails validation with invalid courier', function () {
-        $validator = Validator::make(['courier' => 'invalid_courier'], ['courier' => new CourierRule()]);
+        $validator = Validator::make(['courier' => 'invalid_courier'], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeFalse();
     });
 
     it('fails validation with null value', function () {
-        $validator = Validator::make(['courier' => null], ['courier' => new CourierRule()]);
+        $validator = Validator::make(['courier' => null], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeFalse();
     });
 
     it('fails validation with empty string', function () {
-        $validator = Validator::make(['courier' => ""], ['courier' => new CourierRule()]);
+        $validator = Validator::make(['courier' => ''], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeFalse();
     });
 
     it('fails validation with numeric value', function () {
-        $validator = Validator::make(['courier' => 123], ['courier' => new CourierRule()]);
+        $validator = Validator::make(['courier' => 123], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeFalse();
     });
 
     it('fails validation with array', function () {
-        $validator = Validator::make(['courier' => ['jne']], ['courier' => new CourierRule()]);
+        $validator = Validator::make(['courier' => ['jne']], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeFalse();
     });
 
     it('returns error message for invalid courier', function () {
-        $validator = Validator::make(['courier' => 'invalid_courier'], ['courier' => new CourierRule()]);
+        $validator = Validator::make(['courier' => 'invalid_courier'], ['courier' => new CourierRule]);
         expect($validator->fails())->toBeTrue();
 
         $errors = $validator->errors();
@@ -124,7 +124,7 @@ describe('CourierRule Static Methods', function () {
 
     it('validates non-array as invalid', function () {
         // Since validateCouriers expects array, we need to test this differently
-        expect(fn() => CourierRule::validateCouriers('jne'))->toThrow(TypeError::class);
+        expect(fn () => CourierRule::validateCouriers('jne'))->toThrow(TypeError::class);
     });
 
 });
@@ -132,24 +132,24 @@ describe('CourierRule Static Methods', function () {
 describe('CourierRule Edge Cases', function () {
 
     it('handles case sensitivity', function () {
-        $validator = Validator::make(['courier' => 'JNE'], ['courier' => new CourierRule()]);
+        $validator = Validator::make(['courier' => 'JNE'], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeFalse();
 
-        $validator = Validator::make(['courier' => 'jne'], ['courier' => new CourierRule()]);
+        $validator = Validator::make(['courier' => 'jne'], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeTrue();
     });
 
     it('handles whitespace', function () {
-        $validator = Validator::make(['courier' => ' jne '], ['courier' => new CourierRule()]);
+        $validator = Validator::make(['courier' => ' jne '], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeFalse(); // Should not have whitespace
 
-        $validator = Validator::make(['courier' => 'jne'], ['courier' => new CourierRule()]);
+        $validator = Validator::make(['courier' => 'jne'], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeTrue();
     });
 
     it('converts all enum cases correctly', function () {
         $allCases = Courier::cases();
-        $enumArray = array_map(fn($case) => $case, $allCases);
+        $enumArray = array_map(fn ($case) => $case, $allCases);
         $converted = CourierRule::convertCouriersToValues($enumArray);
 
         expect($converted)->toHaveCount(count($allCases));

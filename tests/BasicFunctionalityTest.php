@@ -15,12 +15,12 @@ beforeEach(function () {
 describe('Basic Package Functionality', function () {
 
     it('can instantiate RajaOngkir class', function () {
-        $rajaongkir = new RajaOngkir();
+        $rajaongkir = new RajaOngkir;
         expect($rajaongkir)->toBeInstanceOf(RajaOngkir::class);
     });
 
     it('can instantiate CourierRule', function () {
-        $rule = new CourierRule();
+        $rule = new CourierRule;
         expect($rule)->toBeInstanceOf(CourierRule::class);
     });
 
@@ -31,49 +31,49 @@ describe('Basic Package Functionality', function () {
     });
 
     it('courier rule validates valid courier strings using Laravel validator', function () {
-        $validator = validator(['courier' => 'jne'], ['courier' => new CourierRule()]);
+        $validator = validator(['courier' => 'jne'], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeTrue();
-        
-        $validator = validator(['courier' => 'tiki'], ['courier' => new CourierRule()]);
+
+        $validator = validator(['courier' => 'tiki'], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeTrue();
-        
-        $validator = validator(['courier' => 'sicepat'], ['courier' => new CourierRule()]);
+
+        $validator = validator(['courier' => 'sicepat'], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeTrue();
     });
 
     it('courier rule validates valid courier enums using Laravel validator', function () {
-        $validator = validator(['courier' => Courier::JNE], ['courier' => new CourierRule()]);
+        $validator = validator(['courier' => Courier::JNE], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeTrue();
-        
-        $validator = validator(['courier' => Courier::TIKI], ['courier' => new CourierRule()]);
+
+        $validator = validator(['courier' => Courier::TIKI], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeTrue();
-        
-        $validator = validator(['courier' => Courier::SICEPAT], ['courier' => new CourierRule()]);
+
+        $validator = validator(['courier' => Courier::SICEPAT], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeTrue();
     });
 
     it('courier rule rejects invalid courier using Laravel validator', function () {
-        $validator = validator(['courier' => 'invalid'], ['courier' => new CourierRule()]);
+        $validator = validator(['courier' => 'invalid'], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeFalse();
-        
-        $validator = validator(['courier' => 'xyz'], ['courier' => new CourierRule()]);
+
+        $validator = validator(['courier' => 'xyz'], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeFalse();
-        
-        $validator = validator(['courier' => null], ['courier' => new CourierRule()]);
+
+        $validator = validator(['courier' => null], ['courier' => new CourierRule]);
         expect($validator->passes())->toBeFalse();
     });
 
     it('can convert courier enums to values', function () {
         $couriers = [Courier::JNE, Courier::TIKI];
         $values = CourierRule::convertCouriersToValues($couriers);
-        
+
         expect($values)->toBe(['jne', 'tiki']);
     });
 
     it('can convert mixed courier array to values', function () {
         $couriers = [Courier::JNE, 'tiki', Courier::SICEPAT];
         $values = CourierRule::convertCouriersToValues($couriers);
-        
+
         expect($values)->toBe(['jne', 'tiki', 'sicepat']);
     });
 
@@ -88,36 +88,36 @@ describe('Basic Package Functionality', function () {
 describe('Cache Support Detection', function () {
 
     it('can detect cache tagging support', function () {
-        $rajaongkir = new RajaOngkir();
-        
+        $rajaongkir = new RajaOngkir;
+
         // Use reflection to test protected method
         $reflection = new ReflectionClass($rajaongkir);
         $method = $reflection->getMethod('cacheSupportsTagging');
         $method->setAccessible(true);
-        
+
         $result = $method->invoke($rajaongkir);
         expect($result)->toBeBool();
     });
 
     it('can get cache instance', function () {
-        $rajaongkir = new RajaOngkir();
-        
+        $rajaongkir = new RajaOngkir;
+
         // Use reflection to test protected method
         $reflection = new ReflectionClass($rajaongkir);
         $method = $reflection->getMethod('getCacheInstance');
         $method->setAccessible(true);
-        
+
         $result = $method->invoke($rajaongkir, ['test-tag']);
         expect($result)->toBeInstanceOf(\Illuminate\Contracts\Cache\Repository::class);
     });
 
     it('cache clearing methods do not throw errors', function () {
-        $rajaongkir = new RajaOngkir();
-        
-        expect(fn() => $rajaongkir->clearCache())->not->toThrow(Exception::class);
-        expect(fn() => $rajaongkir->clearLocationCache())->not->toThrow(Exception::class);
-        expect(fn() => $rajaongkir->clearCostCache())->not->toThrow(Exception::class);
-        expect(fn() => $rajaongkir->clearLocationTypeCache('provinces'))->not->toThrow(Exception::class);
+        $rajaongkir = new RajaOngkir;
+
+        expect(fn () => $rajaongkir->clearCache())->not->toThrow(Exception::class);
+        expect(fn () => $rajaongkir->clearLocationCache())->not->toThrow(Exception::class);
+        expect(fn () => $rajaongkir->clearCostCache())->not->toThrow(Exception::class);
+        expect(fn () => $rajaongkir->clearLocationTypeCache('provinces'))->not->toThrow(Exception::class);
     });
 
 });
@@ -130,11 +130,11 @@ describe('Configuration', function () {
     });
 
     it('can set cache durations', function () {
-        $rajaongkir = new RajaOngkir();
-        
+        $rajaongkir = new RajaOngkir;
+
         $result1 = $rajaongkir->setLocationCacheDuration(7200);
         expect($result1)->toBeInstanceOf(RajaOngkir::class);
-        
+
         $result2 = $rajaongkir->setCostCacheDuration(1800);
         expect($result2)->toBeInstanceOf(RajaOngkir::class);
     });
@@ -142,8 +142,8 @@ describe('Configuration', function () {
     it('handles missing cache configuration gracefully', function () {
         config(['rajaongkir.cost_cache_duration' => null]);
         config(['rajaongkir.location_cache_duration' => null]);
-        
-        $rajaongkir = new RajaOngkir();
+
+        $rajaongkir = new RajaOngkir;
         expect($rajaongkir)->toBeInstanceOf(RajaOngkir::class);
     });
 
@@ -159,7 +159,7 @@ describe('Service Provider Integration', function () {
     it('service is singleton', function () {
         $service1 = app(RajaOngkir::class);
         $service2 = app(RajaOngkir::class);
-        
+
         expect($service1)->toBe($service2);
     });
 

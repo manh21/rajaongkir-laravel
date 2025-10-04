@@ -6,11 +6,11 @@ describe('Courier Enum', function () {
 
     it('has all required courier cases', function () {
         $expectedCouriers = [
-            'pos', 'lion', 'ninja', 'ide', 'sicepat', 'sap', 
-            'rex', 'sentral', 'jne', 'tiki', 'wahana', 'jnt'
+            'pos', 'lion', 'ninja', 'ide', 'sicepat', 'sap',
+            'rex', 'sentral', 'jne', 'tiki', 'wahana', 'jnt',
         ];
 
-        $actualCouriers = array_map(fn($case) => $case->value, Courier::cases());
+        $actualCouriers = array_map(fn ($case) => $case->value, Courier::cases());
 
         foreach ($expectedCouriers as $expected) {
             expect($actualCouriers)->toContain($expected);
@@ -42,7 +42,7 @@ describe('Courier Enum', function () {
 
     it('can be used in arrays', function () {
         $couriers = [Courier::JNE, Courier::TIKI, Courier::SICEPAT];
-        
+
         expect($couriers)->toHaveCount(3)
             ->and($couriers[0])->toBeInstanceOf(Courier::class)
             ->and($couriers[0]->value)->toBe('jne');

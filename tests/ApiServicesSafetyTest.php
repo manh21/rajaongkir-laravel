@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Http;
-use Komodo\RajaOngkir\RajaOngkir;
 use Komodo\RajaOngkir\Constants\Courier;
+use Komodo\RajaOngkir\RajaOngkir;
 
 beforeEach(function () {
     config([
@@ -22,26 +22,26 @@ describe('API Services Type Safety', function () {
                 'data' => [
                     ['id' => 1, 'name' => 'DKI Jakarta'],
                     ['id' => 2, 'name' => 'Jawa Barat'],
-                ]
+                ],
             ], 200),
         ]);
 
-        $rajaongkir = new RajaOngkir();
-        
+        $rajaongkir = new RajaOngkir;
+
         // This should work without type errors
         $result = $rajaongkir->getProvinces();
-        
+
         expect($result)->toBeArray()
             ->and($result)->toHaveCount(2)
             ->and($result[0])->toHaveKey('id')
             ->and($result[0])->toHaveKey('name');
-            
+
         Http::assertSentCount(1);
     });
 
     it('handles validation errors properly', function () {
-        $rajaongkir = new RajaOngkir();
-        
+        $rajaongkir = new RajaOngkir;
+
         // Test validation without making API calls
         expect(function () use ($rajaongkir) {
             $rajaongkir->calculateDistrictCost(
@@ -54,12 +54,12 @@ describe('API Services Type Safety', function () {
     });
 
     it('can clear cache without errors', function () {
-        $rajaongkir = new RajaOngkir();
-        
+        $rajaongkir = new RajaOngkir;
+
         // These should work with any cache driver
-        expect(fn() => $rajaongkir->clearCache())->not->toThrow(Exception::class);
-        expect(fn() => $rajaongkir->clearLocationCache())->not->toThrow(Exception::class);
-        expect(fn() => $rajaongkir->clearCostCache())->not->toThrow(Exception::class);
+        expect(fn () => $rajaongkir->clearCache())->not->toThrow(Exception::class);
+        expect(fn () => $rajaongkir->clearLocationCache())->not->toThrow(Exception::class);
+        expect(fn () => $rajaongkir->clearCostCache())->not->toThrow(Exception::class);
     });
 
 });

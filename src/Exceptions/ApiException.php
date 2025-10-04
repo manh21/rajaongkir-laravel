@@ -43,7 +43,7 @@ class ApiException extends RuntimeException
             }
         }
 
-        if (!is_array($response)) {
+        if (! is_array($response)) {
             return new self('Unknown API error', $statusCode, ['response' => $response], $previous);
         }
 

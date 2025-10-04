@@ -11,11 +11,12 @@ class CourierRule implements ValidationRule
     public function validate(string $attribute, $value, Closure $fail): void
     {
         // Check if value is null or not a string or Courier enum
-        if (empty($value) || is_null($value) || $value === "" || (! is_string($value) && ! $value instanceof Courier)) {
+        if (empty($value) || is_null($value) || $value === '' || (! is_string($value) && ! $value instanceof Courier)) {
             $fail(__('rajaongkir::rajaongkir.validation.invalid_courier', [
                 'attribute' => $attribute,
                 'couriers' => implode(', ', self::getValidCouriers()),
             ]));
+
             return;
         }
 

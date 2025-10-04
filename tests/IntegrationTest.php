@@ -3,8 +3,8 @@
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Komodo\RajaOngkir\Constants\Courier;
-use Komodo\RajaOngkir\RajaOngkir;
 use Komodo\RajaOngkir\Facades\RajaOngkir as RajaOngkirFacade;
+use Komodo\RajaOngkir\RajaOngkir;
 
 beforeEach(function () {
     config([
@@ -21,7 +21,7 @@ beforeEach(function () {
                 ['id' => 6, 'name' => 'DKI Jakarta'],
                 ['id' => 9, 'name' => 'Jawa Barat'],
                 ['id' => 10, 'name' => 'Jawa Tengah'],
-            ]
+            ],
         ], 200),
 
         '*/city/6*' => Http::response([
@@ -30,7 +30,7 @@ beforeEach(function () {
                 ['id' => 151, 'name' => 'Jakarta Pusat', 'province_id' => 6],
                 ['id' => 152, 'name' => 'Jakarta Selatan', 'province_id' => 6],
                 ['id' => 153, 'name' => 'Jakarta Barat', 'province_id' => 6],
-            ]
+            ],
         ], 200),
         '*/city/3*' => Http::response([
             'status' => 200,
@@ -38,7 +38,7 @@ beforeEach(function () {
                 ['id' => 151, 'name' => 'Jakarta Pusat', 'province_id' => 6],
                 ['id' => 152, 'name' => 'Jakarta Selatan', 'province_id' => 6],
                 ['id' => 153, 'name' => 'Jakarta Barat', 'province_id' => 6],
-            ]
+            ],
         ], 200),
 
         '*/district/151*' => Http::response([
@@ -46,7 +46,7 @@ beforeEach(function () {
             'data' => [
                 ['id' => 1701, 'name' => 'Gambir', 'city_id' => 151],
                 ['id' => 1702, 'name' => 'Tanah Abang', 'city_id' => 151],
-            ]
+            ],
         ], 200),
 
         '*/calculate/district/domestic-cost*' => Http::response([
@@ -60,16 +60,16 @@ beforeEach(function () {
                         'courier' => 'jne',
                         'service' => 'REG',
                         'cost' => 9000,
-                        'etd' => '1-2'
+                        'etd' => '1-2',
                     ],
                     [
                         'courier' => 'tiki',
                         'service' => 'REG',
                         'cost' => 8500,
-                        'etd' => '1-3'
-                    ]
-                ]
-            ]
+                        'etd' => '1-3',
+                    ],
+                ],
+            ],
         ], 200),
 
         '*/track/waybill*' => Http::response([
@@ -82,8 +82,8 @@ beforeEach(function () {
                     ['date' => '2023-10-04 14:30', 'description' => 'Package delivered to recipient'],
                     ['date' => '2023-10-04 08:15', 'description' => 'Out for delivery'],
                     ['date' => '2023-10-03 18:45', 'description' => 'Package arrived at destination facility'],
-                ]
-            ]
+                ],
+            ],
         ], 200),
     ]);
 });
@@ -91,7 +91,7 @@ beforeEach(function () {
 describe('Complete Shipping Cost Workflow', function () {
 
     it('can complete full shipping cost calculation workflow', function () {
-        $rajaongkir = new RajaOngkir();
+        $rajaongkir = new RajaOngkir;
 
         // Step 1: Get provinces
         $provinces = $rajaongkir->getProvinces();
@@ -149,7 +149,7 @@ describe('Complete Shipping Cost Workflow', function () {
 describe('Package Tracking Workflow', function () {
 
     it('can track package from order to delivery', function () {
-        $rajaongkir = new RajaOngkir();
+        $rajaongkir = new RajaOngkir;
 
         // Track a JNE package
         $tracking = $rajaongkir->trackAWB(
@@ -174,7 +174,7 @@ describe('Package Tracking Workflow', function () {
 describe('Caching Performance', function () {
 
     it('demonstrates caching performance benefits', function () {
-        $rajaongkir = new RajaOngkir();
+        $rajaongkir = new RajaOngkir;
 
         // First province request (will hit API)
         $start = microtime(true);
@@ -197,7 +197,7 @@ describe('Caching Performance', function () {
     });
 
     it('uses separate cache keys for different parameters', function () {
-        $rajaongkir = new RajaOngkir();
+        $rajaongkir = new RajaOngkir;
 
         // Request for different cities should make separate API calls
         $cities1 = $rajaongkir->getCities(6);  // Jakarta
@@ -208,7 +208,7 @@ describe('Caching Performance', function () {
     });
 
     it('can clear cache selectively', function () {
-        $rajaongkir = new RajaOngkir();
+        $rajaongkir = new RajaOngkir;
 
         // Populate cache
         $provinces = $rajaongkir->getProvinces();
@@ -231,7 +231,7 @@ describe('Multi-Language Support', function () {
     it('provides validation messages in English', function () {
         app()->setLocale('en');
 
-        $rajaongkir = new RajaOngkir();
+        $rajaongkir = new RajaOngkir;
 
         try {
             $rajaongkir->calculateDistrictCost(
@@ -252,7 +252,7 @@ describe('Multi-Language Support', function () {
     it('provides validation messages in Indonesian', function () {
         app()->setLocale('id');
 
-        $rajaongkir = new RajaOngkir();
+        $rajaongkir = new RajaOngkir;
 
         try {
             $rajaongkir->calculateDistrictCost(
@@ -275,10 +275,10 @@ describe('Error Handling', function () {
 
     it('handles API errors gracefully', function () {
         Http::fake([
-            '*/province*' => Http::response(['error' => 'API Error'], 500)
+            '*/province*' => Http::response(['error' => 'API Error'], 500),
         ]);
 
-        $rajaongkir = new RajaOngkir();
+        $rajaongkir = new RajaOngkir;
 
         // We should also disable cache for this test to ensure it hits the API
         $rajaongkir->clearCache();
@@ -290,7 +290,7 @@ describe('Error Handling', function () {
     });
 
     it('validates input parameters thoroughly', function () {
-        $rajaongkir = new RajaOngkir();
+        $rajaongkir = new RajaOngkir;
 
         // Test multiple validation scenarios
         $invalidInputs = [
@@ -314,7 +314,7 @@ describe('Error Handling', function () {
 describe('Performance and Reliability', function () {
 
     it('handles multiple concurrent requests efficiently', function () {
-        $rajaongkir = new RajaOngkir();
+        $rajaongkir = new RajaOngkir;
 
         // Simulate multiple cost calculations
         $results = [];
@@ -335,7 +335,7 @@ describe('Performance and Reliability', function () {
     });
 
     it('maintains data consistency across cache operations', function () {
-        $rajaongkir = new RajaOngkir();
+        $rajaongkir = new RajaOngkir;
 
         // Get data
         $provinces1 = $rajaongkir->getProvinces();

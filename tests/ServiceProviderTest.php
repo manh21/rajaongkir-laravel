@@ -15,7 +15,7 @@ describe('Service Provider Registration', function () {
     it('registers rajaongkir as singleton', function () {
         $service1 = app(RajaOngkir::class);
         $service2 = app(RajaOngkir::class);
-        
+
         expect($service1)->toBe($service2); // Should be same instance
     });
 
@@ -31,17 +31,17 @@ describe('Configuration Publishing', function () {
     it('has default configuration values', function () {
         expect(config('rajaongkir.base_url'))
             ->toBe('https://rajaongkir.komerce.id/api/v1');
-        
+
         expect(config('rajaongkir.cost_cache_duration'))
             ->toBe(60);
-        
+
         expect(config('rajaongkir.location_cache_duration'))
             ->toBe(1440);
     });
 
     it('can override configuration with environment variables', function () {
         config(['rajaongkir.api_key' => 'test-key-from-config']);
-        
+
         expect(config('rajaongkir.api_key'))
             ->toBe('test-key-from-config');
     });
@@ -52,7 +52,7 @@ describe('Translation Files', function () {
 
     it('loads English translations', function () {
         app()->setLocale('en');
-        
+
         $translation = __('rajaongkir::rajaongkir.validation.courier_required');
         expect($translation)->toBeString()
             ->and($translation)->not->toContain('rajaongkir::'); // Should be translated
@@ -60,7 +60,7 @@ describe('Translation Files', function () {
 
     it('loads Indonesian translations', function () {
         app()->setLocale('id');
-        
+
         $translation = __('rajaongkir::rajaongkir.validation.courier_required');
         expect($translation)->toBeString()
             ->and($translation)->not->toContain('rajaongkir::'); // Should be translated
@@ -71,22 +71,22 @@ describe('Translation Files', function () {
         app()->setLocale('en');
         $enTranslation = __('rajaongkir::rajaongkir.validation.weight_required');
         expect($enTranslation)->toContain('weight');
-        
+
         // Indonesian
         app()->setLocale('id');
         $idTranslation = __('rajaongkir::rajaongkir.validation.weight_required');
         expect($idTranslation)->toContain('berat');
-        
+
         // They should be different
         expect($enTranslation)->not->toBe($idTranslation);
     });
 
     it('has all required validation keys in English', function () {
         app()->setLocale('en');
-        
+
         $requiredKeys = [
             'origin_required',
-            'destination_required', 
+            'destination_required',
             'weight_required',
             'courier_required',
             'weight_exceeds_limit',
@@ -103,10 +103,10 @@ describe('Translation Files', function () {
 
     it('has all required validation keys in Indonesian', function () {
         app()->setLocale('id');
-        
+
         $requiredKeys = [
             'origin_required',
-            'destination_required', 
+            'destination_required',
             'weight_required',
             'courier_required',
             'weight_exceeds_limit',
@@ -127,7 +127,7 @@ describe('Service Provider Boot Process', function () {
 
     it('publishes configuration files', function () {
         $provider = new RajaOngkirServiceProvider(app());
-        
+
         // Test that the provider can be instantiated
         expect($provider)->toBeInstanceOf(RajaOngkirServiceProvider::class);
     });
@@ -144,29 +144,29 @@ describe('Package Integration', function () {
 
     it('integrates with Laravel validation system', function () {
         $validator = validator(['courier' => 'jne'], [
-            'courier' => [new \Komodo\RajaOngkir\Rules\CourierRule()]
+            'courier' => [new \Komodo\RajaOngkir\Rules\CourierRule],
         ]);
-        
+
         expect($validator->passes())->toBeTrue();
     });
 
     it('works with Laravel cache system', function () {
         $rajaongkir = app(RajaOngkir::class);
-        
+
         // Test that cache methods don't throw errors
-        expect(fn() => $rajaongkir->clearCache())->not->toThrow(Exception::class);
-        expect(fn() => $rajaongkir->clearLocationCache())->not->toThrow(Exception::class);
-        expect(fn() => $rajaongkir->clearCostCache())->not->toThrow(Exception::class);
+        expect(fn () => $rajaongkir->clearCache())->not->toThrow(Exception::class);
+        expect(fn () => $rajaongkir->clearLocationCache())->not->toThrow(Exception::class);
+        expect(fn () => $rajaongkir->clearCostCache())->not->toThrow(Exception::class);
     });
 
     it('supports different cache drivers', function () {
         // Test with array cache (default in testing)
         config(['cache.default' => 'array']);
-        $rajaongkir = new RajaOngkir();
+        $rajaongkir = new RajaOngkir;
         expect($rajaongkir)->toBeInstanceOf(RajaOngkir::class);
-        
+
         // Test cache operations don't fail
-        expect(fn() => $rajaongkir->clearCache())->not->toThrow(Exception::class);
+        expect(fn () => $rajaongkir->clearCache())->not->toThrow(Exception::class);
     });
 
 });
@@ -175,8 +175,8 @@ describe('Environment Configuration', function () {
 
     it('handles missing API key gracefully', function () {
         config(['rajaongkir.api_key' => null]);
-        
-        $rajaongkir = new RajaOngkir();
+
+        $rajaongkir = new RajaOngkir;
         expect($rajaongkir)->toBeInstanceOf(RajaOngkir::class);
     });
 
@@ -184,8 +184,8 @@ describe('Environment Configuration', function () {
         // Clear specific config values
         config(['rajaongkir.cost_cache_duration' => null]);
         config(['rajaongkir.location_cache_duration' => null]);
-        
-        $rajaongkir = new RajaOngkir();
+
+        $rajaongkir = new RajaOngkir;
         expect($rajaongkir)->toBeInstanceOf(RajaOngkir::class);
     });
 
@@ -193,15 +193,15 @@ describe('Environment Configuration', function () {
         // Test with valid durations
         config(['rajaongkir.cost_cache_duration' => 30]);
         config(['rajaongkir.location_cache_duration' => 720]);
-        
-        $rajaongkir = new RajaOngkir();
+
+        $rajaongkir = new RajaOngkir;
         expect($rajaongkir)->toBeInstanceOf(RajaOngkir::class);
-        
+
         // Test with invalid durations (should use defaults)
         config(['rajaongkir.cost_cache_duration' => -1]);
         config(['rajaongkir.location_cache_duration' => 'invalid']);
-        
-        $rajaongkir = new RajaOngkir();
+
+        $rajaongkir = new RajaOngkir;
         expect($rajaongkir)->toBeInstanceOf(RajaOngkir::class);
     });
 
