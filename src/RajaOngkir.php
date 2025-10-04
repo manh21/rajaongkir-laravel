@@ -323,6 +323,41 @@ class RajaOngkir {
     }
 
     /**
+     * Track AWB (Airway Bill)
+     * @param string $waybill
+     * @param string $courier courier code from Courier enum
+     * @param string|null $last_phone_number last 5 digits of recipient's phone number (optional, some couriers require this)
+     * @return array
+     */
+    public function trackAWB(
+        string $waybill,
+        string $courier,
+        ?string $last_phone_number = null
+    ): array
+    {
+        // Validate courier
+        if (!in_array($courier, \Komodo\RajaOngkir\Constants\Courier::getValidCouriers(), true)) {
+            throw new \InvalidArgumentException("Invalid courier code: {$courier}");
+        }
+        
+        $path = '/track/waybill';
+        $params = [
+            'waybill' => $waybill,
+            'courier' => $courier,
+        ];
+
+        if($last_phone_number) {
+            $params['last_phone_number'] = $last_phone_number;
+        }
+
+        $cacheKey = "rajaongkir.waybill.{$waybill}.{$courier}." . ($last_phone_number ? $last_phone_number : 'no_phone');
+        return Cache::tags([self::CACHE_TAG_COSTS])
+            ->remember($cacheKey, $this->costCacheDuration, function () use ($path, $params) {
+                return Api::api($path, 'post', param: $params)->data();
+            });
+    }
+
+    /**
      * Clear all cached data
      *
      * @return void
