@@ -3,7 +3,7 @@
 namespace Komodo\RajaOngkir;
 
 use Illuminate\Support\Facades\Cache;
-use Komodo\RajaOngkir\Facades\Api;
+use Komodo\RajaOngkir\Services\ApiServices as Api;
 use Komodo\RajaOngkir\Rules\CourierRule;
 
 class RajaOngkir

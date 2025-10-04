@@ -248,6 +248,50 @@ composer test
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
+## 🧪 Testing
+
+The package includes comprehensive tests covering all major functionality:
+
+### Running Tests
+
+```bash
+composer test
+```
+
+### Test Coverage
+
+- **BasicFunctionalityTest** - Core components and validation ✅
+- **CourierEnumTest** - Courier enum validation
+- **CourierRuleTest** - Laravel validation rules  
+- **CostCalculationTest** - API cost calculations with mocking
+- **IntegrationTest** - Complete workflow testing
+- **ServiceProviderTest** - Laravel service provider integration
+
+### Test Structure
+
+```php
+// Example test usage
+use Komodo\RajaOngkir\Constants\Courier;
+use Komodo\RajaOngkir\Rules\CourierRule;
+
+// Test courier validation
+$validator = validator(['courier' => Courier::JNE], [
+    'courier' => new CourierRule()
+]);
+expect($validator->passes())->toBeTrue();
+
+// Test courier conversion
+$converted = CourierRule::convertCouriersToValues([Courier::JNE, 'tiki']);
+expect($converted)->toBe(['jne', 'tiki']);
+```
+
+### Cache Driver Testing
+
+The package automatically detects and adapts to your cache driver:
+
+- **Redis/Memcached**: Full tagging support for granular cache management
+- **File/Database/Array**: Basic caching with fallback mechanisms
+
 ## Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.

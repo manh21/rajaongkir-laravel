@@ -9,7 +9,7 @@ use Komodo\RajaOngkir\Exceptions\ApiException;
 
 class ApiServices
 {
-    private static ?array $response;
+    private static ?\Illuminate\Http\Client\Response $response;
 
     private static ?array $data;
 
@@ -57,12 +57,17 @@ class ApiServices
         return new self;
     }
 
-    protected function dataToArray($result): ?array
+    protected static function dataToArray($result): ?array
     {
         return Arr::get($result, 'data', null);
     }
 
     public function all(): ?array
+    {
+        return self::$response?->json();
+    }
+
+    public function response(): ?\Illuminate\Http\Client\Response
     {
         return self::$response;
     }

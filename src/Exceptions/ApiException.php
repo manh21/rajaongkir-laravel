@@ -30,18 +30,33 @@ class ApiException extends RuntimeException
         parent::__construct($message, $code, $previous);
     }
 
-    public static function fromResponse(array $response, ?\Throwable $previous = null): self
+    public static function fromResponse($response, int $statusCode = 500, ?\Throwable $previous = null): self
     {
+        // Handle different response types
+        if (is_string($response)) {
+            // Handle string response (raw body)
+            $decoded = json_decode($response, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $response = $decoded;
+            } else {
+                return new self($response, $statusCode, ['raw' => $response], $previous);
+            }
+        }
+
+        if (!is_array($response)) {
+            return new self('Unknown API error', $statusCode, ['response' => $response], $previous);
+        }
+
         // Handle different API response formats
         if (isset($response['meta'])) {
             // Handle error response with "meta" structure
             $meta = $response['meta'];
             $message = $meta['message'] ?? 'An unknown error occurred';
-            $code = $meta['code'] ?? 500;
+            $code = $meta['code'] ?? $statusCode;
         } else {
             // Fallback for unknown response structure
             $message = $response['message'] ?? $response['error'] ?? 'An unknown error occurred';
-            $code = $response['code'] ?? $response['status_code'] ?? 500;
+            $code = $response['code'] ?? $response['status_code'] ?? $statusCode;
         }
 
         return new self($message, $code, $response, $previous);
