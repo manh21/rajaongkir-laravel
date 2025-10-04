@@ -127,23 +127,6 @@ $cost = $rajaongkir->calculateDistrictCost(
 );
 ```
 
-#### Menggunakan Form Request (Untuk Controller)
-
-```php
-use Komodo\RajaOngkir\Requests\CalculateCostRequest;
-
-public function calculateCost(CalculateCostRequest $request, Rajaongkir $rajaongkir)
-{
-    // Validasi otomatis melalui Form Request
-    $result = $rajaongkir->districtCalculateCost($request);
-    
-    return response()->json([
-        'success' => true,
-        'data' => $result
-    ]);
-}
-```
-
 ### Menggunakan Courier Enum & Validasi
 
 ```php
