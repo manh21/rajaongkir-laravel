@@ -56,6 +56,11 @@ class ApiServices
         self::$response = $res;
         self::$data = self::dataToArray($res->json());
 
+        // make sure the data is not empty or null
+        if(is_null(self::$data) || empty(self::$data)){
+            throw new ApiException(__("rajaongkir::rajaongkir.api.no_data"), 204);
+        }
+
         return new self;
     }
 
