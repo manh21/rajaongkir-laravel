@@ -2,6 +2,14 @@
 
 All notable changes to `rajaongkir-laravel` will be documented in this file.
 
+## 1.0.6 - 2025-10-05
+
+Fixes:
+
+* Fix Calculate Shipping Rate Call
+
+**Full Changelog**: https://github.com/manh21/rajaongkir-laravel/compare/1.0.5...1.0.6
+
 ## 1.0.5 - 2025-10-04
 
 Fully Integrated Test and Use Case
