@@ -19,7 +19,6 @@ class ApiServices
     public static function getHeader(string $path): array
     {
         return [
-            'Content-Type' => 'application/x-www-form-urlencoded',
             'Accept' => 'application/json',
             'Location' => $path,
             'key' => config('rajaongkir.api_key'),
@@ -34,6 +33,7 @@ class ApiServices
         $header = self::getHeader($path);
         $baseUrl = config('rajaongkir.base_url', '');
         $res = Http::withHeaders($header)
+            ->asForm()
             ->withQueryParameters($params)
             ->$method($baseUrl.$path, $bodies);
 
