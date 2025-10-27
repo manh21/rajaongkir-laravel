@@ -86,7 +86,7 @@ jobs:
           DB_DATABASE: ":memory:"
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: test-results-${{ matrix.php }}-${{ matrix.laravel }}-${{ matrix.os }}
